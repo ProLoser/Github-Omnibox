@@ -9,3 +9,4 @@ Github Launch for your Google Chrome Omnibox (search box)
 * Autocomplete search results for issues, users, and repos
   * Requires circumventing XHR restrictions
 * Icons
+* History
