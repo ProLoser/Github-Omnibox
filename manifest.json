@@ -6,5 +6,12 @@
     "scripts": ["background.js"]
   },
   "omnibox": { "keyword" : "gh" },
+  "icons": {
+  	"16": "images/favicon-16.png",
+  	"32": "images/favicon-32.png",
+  	"114": "images/apple-touch-icon-114.png",
+  	"144": "images/apple-touch-icon-144.png",
+  	"512": "images/fluidicon.png"
+  },
   "manifest_version": 2
 }
