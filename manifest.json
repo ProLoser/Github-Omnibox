@@ -1,0 +1,10 @@
+{
+  "name": "Github Omnibox",
+  "description" : "To use, type 'gh' plus a Github Launch search term.",
+  "version": "0.1.0",
+  "background": {
+    "scripts": ["background.js"]
+  },
+  "omnibox": { "keyword" : "gh" },
+  "manifest_version": 2
+}
