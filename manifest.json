@@ -1,7 +1,7 @@
 {
   "name": "Github Omnibox",
-  "description" : "To use, type 'gh' plus a Github Launch search term.",
-  "version": "0.1.0",
+  "description" : "The power of Github's command-powered searchbox in your browser! Type 'gh' and then your search term.",
+  "version": "0.1.1",
   "background": {
     "scripts": ["background.js"]
   },
