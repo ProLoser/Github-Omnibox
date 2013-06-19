@@ -9,6 +9,7 @@ global =
   issues: []
   orgs: []
   theirRepos: []
+  theirUser: null
 
 cleanup = ->
   global.theirRepos = []
@@ -55,7 +56,11 @@ setDefault = (text, suggest) ->
     description = "Go to"
   else if type = tools.user(text)
     description += "user"
-  else if text.match /(^[\w-]+\/$)/
+  else if text.match /(^[\w-]+\/[\w-\.]*$)/
+    textSplit = text.split '/'
+    if global.theirUser and global.theirUser != textSplit[0]
+      cleanup()
+    global.theirUser = textSplit[0]
     suggestTheirRepos text, suggest
   else if type = text.match /(^[\w-]+\/[\w-\.]+\s+)/
     suggestActions text, suggest
@@ -106,9 +111,11 @@ suggestTheirRepos = (text, suggest) ->
       global.theirRepos = repos
       if repos.length
         suggestTheirRepos(text, suggest)
-  _(filter(
-    name: textSplit[0]
-  , global.theirRepos)).each (repo) ->
+  if (textSplit[1])
+    repos = filter name: textSplit[1] , global.theirRepos
+  else
+    repos = _.clone(global.theirRepos)
+  _(repos).each (repo) ->
     suggestions.push
       description: repo.full_name
       content: repo.full_name

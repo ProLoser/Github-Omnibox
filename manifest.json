@@ -1,7 +1,7 @@
 {
   "name": "Github Omnibox",
   "description" : "The power of Github's command-powered searchbox in your browser! Type 'gh' and then your search term.",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "background": {
     "scripts": ["lib/base64.js", "lib/underscore-min.js", "lib/github.js", "background.js"]
   },

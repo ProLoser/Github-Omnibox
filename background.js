@@ -13,7 +13,8 @@
     users: [],
     issues: [],
     orgs: [],
-    theirRepos: []
+    theirRepos: [],
+    theirUser: null
   };
 
   cleanup = function() {
@@ -60,7 +61,7 @@
   };
 
   setDefault = function(text, suggest) {
-    var action, description, type;
+    var action, description, textSplit, type;
 
     type = void 0;
     action = void 0;
@@ -71,7 +72,12 @@
       description = "Go to";
     } else if (type = tools.user(text)) {
       description += "user";
-    } else if (text.match(/(^[\w-]+\/$)/)) {
+    } else if (text.match(/(^[\w-]+\/[\w-\.]*$)/)) {
+      textSplit = text.split('/');
+      if (global.theirUser && global.theirUser !== textSplit[0]) {
+        cleanup();
+      }
+      global.theirUser = textSplit[0];
       suggestTheirRepos(text, suggest);
     } else if (type = text.match(/(^[\w-]+\/[\w-\.]+\s+)/)) {
       suggestActions(text, suggest);
@@ -128,7 +134,7 @@
   };
 
   suggestTheirRepos = function(text, suggest) {
-    var suggestions, textSplit;
+    var repos, suggestions, textSplit;
 
     suggestions = [];
     textSplit = text.split('/');
@@ -143,9 +149,14 @@
         }
       });
     }
-    _(filter({
-      name: textSplit[0]
-    }, global.theirRepos)).each(function(repo) {
+    if (textSplit[1]) {
+      repos = filter({
+        name: textSplit[1]
+      }, global.theirRepos);
+    } else {
+      repos = _.clone(global.theirRepos);
+    }
+    _(repos).each(function(repo) {
       return suggestions.push({
         description: repo.full_name,
         content: repo.full_name
