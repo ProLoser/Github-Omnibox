@@ -240,7 +240,6 @@ chrome.omnibox.onInputEntered.addListener (text) ->
   else if type = tools.user(text)
     tools.navigate type[1]
   else if type = tools.repo(text)
-    console.log type
     if type[2] and (action = tools.repoAction(type[2]))
       if action[2]
         tools.navigate type[1] + "/issues/" + action[2]
@@ -251,6 +250,8 @@ chrome.omnibox.onInputEntered.addListener (text) ->
           tools.navigate travisBase + type[1], true
         else
           tools.navigate type[1] + "/" + action[1]
+    else if type[2]
+      tools.navigate type[1] + "/" + tools.searchUrl(type[2].substr(1))
     else
       tools.navigate type[1]
   else if type = tools.io(text)
