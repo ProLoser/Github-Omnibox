@@ -11,13 +11,18 @@ global =
   theirRepos: []
   theirUser: null
 
+
+chrome.extension.onRequest.addListener (message, sender, sendResponse) ->
+  switch message
+    when 'connect'
+      connect()
+    when 'disconnect'
+      disconnect()
 cleanup = ->
   global.theirRepos = []
 
 authorize = ->
-  localStorage.username = prompt("Please enter your Github username:")
-  localStorage.password = prompt("Please enter your Github password:")
-  alert 'You can deauthorize at any time by entering "gh deauthorize" into the address bar'
+  chrome.tabs.create({url: "options.html"});
 
 connect = ->
   if !localStorage.username or !localStorage.password
@@ -38,13 +43,10 @@ connect = ->
         Array::push.apply global.repos, repos
 
 disconnect = ->
-  localStorage.username = null
-  localStorage.password = null
   github = null
   user = null
   global.repos = []
   global.orgs = []
-  alert 'Done. You can reauthorize at any time by entering "gh authorize" into the address bar'
 
 setDefault = (text, suggest) ->
   type = undefined
@@ -125,7 +127,7 @@ suggestActions = (text, suggest) ->
   suggestions = []
   description = "Go to "
   content = base + text + "/"
-  actions = ["pulse", "wiki", "pulls", "graphs", "network", "issues", "admin", "travis"]
+  actions = ["pulse", "wiki", "pulls", "graphs", "network", "issues", "admin", "travis", "io"]
   text = text.split(" ")
   actions = filter(text[1], actions)
   i = actions.length - 1
@@ -182,7 +184,7 @@ tools =
     text.match /([\w-]+\/[\w-\.]+)(\s+.+)?/
 
   repoAction: (text) ->
-    text.match /(pulse|wiki|pulls|graphs|network|issues|admin|travis|new pull|new issue|#([0-9]+)|@([\w-]+))/
+    text.match /(pulse|wiki|pulls|io|pages|graphs|network|issues|admin|travis|new pull|new issue|#([0-9]+)|@([\w-]+))/
 
   isUrl: (text) ->
     text.match /http[s]?:.*/
@@ -228,12 +230,7 @@ chrome.omnibox.onInputEntered.addListener (text) ->
   cleanup()
   type = undefined
   action = undefined
-  if text is "authorize"
-    authorize()
-    connect()
-  else if text is "deauthorize"
-    disconnect()
-  else if text[0] is "/" and localStorage.username
+  if text[0] is "/" and localStorage.username
     tools.navigate localStorage.username + text
   else if type = tools.isUrl(text)
     tools.navigate text
@@ -248,6 +245,9 @@ chrome.omnibox.onInputEntered.addListener (text) ->
       else
         if action[1] is "travis"
           tools.navigate travisBase + type[1], true
+        else if action[1] is "io" or action[1] is "pages"
+          repo = type[1].split('/')
+          tools.navigate "http://#{repo[0]}.github.io/#{repo[1]}", true
         else
           tools.navigate type[1] + "/" + action[1]
     else if type[2]
@@ -262,10 +262,11 @@ chrome.omnibox.onInputEntered.addListener (text) ->
 chrome.omnibox.onInputCancelled.addListener ->
   cleanup()
 
-if !localStorage.authorized
+if !localStorage.prompted
   if confirm 'Would you like to Authorize Github-Omnibox for personalized suggestions?'
     authorize()
   else
-    alert 'You can authorize at any time by entering "gh authorize" into the address bar'
-  localStorage.authorized = true
-connect()
+    alert 'You can authorize at any time by going into Github-Omnibox options'
+  localStorage.prompted = true
+else
+  connect()

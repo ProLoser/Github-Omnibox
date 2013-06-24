@@ -71,6 +71,9 @@ form {
 		span {
 			display: block;
 			font-weight: normal;
+			&.error {
+				color: red;
+			}
 		}
 	}
 	input {

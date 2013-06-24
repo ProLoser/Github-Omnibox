@@ -17,14 +17,23 @@
     theirUser: null
   };
 
+  chrome.extension.onRequest.addListener(function(message, sender, sendResponse) {
+    switch (message) {
+      case 'connect':
+        return connect();
+      case 'disconnect':
+        return disconnect();
+    }
+  });
+
   cleanup = function() {
     return global.theirRepos = [];
   };
 
   authorize = function() {
-    localStorage.username = prompt("Please enter your Github username:");
-    localStorage.password = prompt("Please enter your Github password:");
-    return alert('You can deauthorize at any time by entering "gh deauthorize" into the address bar');
+    return chrome.tabs.create({
+      url: "options.html"
+    });
   };
 
   connect = function() {
@@ -51,13 +60,10 @@
   };
 
   disconnect = function() {
-    localStorage.username = null;
-    localStorage.password = null;
     github = null;
     user = null;
     global.repos = [];
-    global.orgs = [];
-    return alert('Done. You can reauthorize at any time by entering "gh authorize" into the address bar');
+    return global.orgs = [];
   };
 
   setDefault = function(text, suggest) {
@@ -171,7 +177,7 @@
     suggestions = [];
     description = "Go to ";
     content = base + text + "/";
-    actions = ["pulse", "wiki", "pulls", "graphs", "network", "issues", "admin", "travis"];
+    actions = ["pulse", "wiki", "pulls", "graphs", "network", "issues", "admin", "travis", "io"];
     text = text.split(" ");
     actions = filter(text[1], actions);
     i = actions.length - 1;
@@ -245,7 +251,7 @@
       return text.match(/([\w-]+\/[\w-\.]+)(\s+.+)?/);
     },
     repoAction: function(text) {
-      return text.match(/(pulse|wiki|pulls|graphs|network|issues|admin|travis|new pull|new issue|#([0-9]+)|@([\w-]+))/);
+      return text.match(/(pulse|wiki|pulls|io|pages|graphs|network|issues|admin|travis|new pull|new issue|#([0-9]+)|@([\w-]+))/);
     },
     isUrl: function(text) {
       return text.match(/http[s]?:.*/);
@@ -273,17 +279,12 @@
   });
 
   chrome.omnibox.onInputEntered.addListener(function(text) {
-    var action, type;
+    var action, repo, type;
 
     cleanup();
     type = void 0;
     action = void 0;
-    if (text === "authorize") {
-      authorize();
-      return connect();
-    } else if (text === "deauthorize") {
-      return disconnect();
-    } else if (text[0] === "/" && localStorage.username) {
+    if (text[0] === "/" && localStorage.username) {
       return tools.navigate(localStorage.username + text);
     } else if (type = tools.isUrl(text)) {
       return tools.navigate(text);
@@ -298,6 +299,9 @@
         } else {
           if (action[1] === "travis") {
             return tools.navigate(travisBase + type[1], true);
+          } else if (action[1] === "io" || action[1] === "pages") {
+            repo = type[1].split('/');
+            return tools.navigate("http://" + repo[0] + ".github.io/" + repo[1], true);
           } else {
             return tools.navigate(type[1] + "/" + action[1]);
           }
@@ -318,15 +322,15 @@
     return cleanup();
   });
 
-  if (!localStorage.authorized) {
+  if (!localStorage.prompted) {
     if (confirm('Would you like to Authorize Github-Omnibox for personalized suggestions?')) {
       authorize();
     } else {
-      alert('You can authorize at any time by entering "gh authorize" into the address bar');
+      alert('You can authorize at any time by going into Github-Omnibox options');
     }
-    localStorage.authorized = true;
+    localStorage.prompted = true;
+  } else {
+    connect();
   }
-
-  connect();
 
 }).call(this);
