@@ -12,6 +12,11 @@ class Omni
     text: null
     api: null
     user: null
+    actions:
+        'user': ['followers', 'following', 'starred', 'repositories', 'activities']
+        'my': ['issues', 'dash', 'pulls', 'stars', 'settings']
+        'new': ['issue', 'release']
+        'repo': ['io', 'pulls', 'network', 'pulse', 'settings', 'issues', 'contributors', 'compare', 'wiki', 'graphs', '#', 'tags', 'releases']
     caches:
         my:
             repos: []
@@ -47,18 +52,20 @@ class Omni
     suggest: (@text, @suggester) ->
         split = @text.split(' ')
         suggestions = []
-        @powerPush suggestions, "my ", ['issues', 'dash', 'pulls', 'stars', 'settings', 'followers', 'following', 'starred', 'repositories', 'activities']
-        @powerPush suggestions, "!", ['io', 'pulls', 'network', 'pulse', 'settings', 'issues', 'contributors', 'compare', 'wiki', 'graphs', '#'], 'this repo '
-        @powerPush suggestions, "new ", ['issue', 'repo']
+        @powerPush suggestions, "my ", @actions.my
+        @powerPush suggestions, "my ", @actions.user
+        @powerPush suggestions, "!", @actions.repo, 'this repo '
+        @powerPush suggestions, "!new ", @actions.new, 'this repo '
+        @powerPush suggestions, "new ", ['repo']
             
         switch true
             when !!@text.match /^@\w+/
                 ### @user ###
-                @powerPush suggestions, "#{split[0]} ", ['followers', 'following', 'starred', 'repositories', 'activities']
+                @powerPush suggestions, "#{split[0]} ", @actions.user
             when !!@text.match /^\w+\/[\w-\.]+ /
                 ### 'user/repo ' ###
-                @powerPush suggestions, "#{split[0]} new ", ['issue', 'pull']
-                @powerPush suggestions, "#{split[0]} ", ['issues', 'io', 'pulls', 'network', 'pulse', 'settings', '#']
+                @powerPush suggestions, "#{split[0]} new ", @actions.new
+                @powerPush suggestions, "#{split[0]} ", @actions.repo
             when !!@text.match /^\w+\//
                 ### user/ ###
                 @getTheirRepos split[0].split('/')[0], (repos) =>
@@ -92,11 +99,6 @@ class Omni
                     when split[1] is 'repo'
                         ### new repo ###
                         url = 'new'
-                    when split[1] is 'issue'
-                        ### new issue (current/repo) ###
-                        url = false
-                        @getCurrentRepo (repo) =>
-                            @redirect "#{repo}/issues/new"
             when !!@text.match /^my/
                 ### my ###
                 switch true
@@ -153,9 +155,9 @@ class Omni
                 if split[1]
                     ### user/repo whatever ###
                     switch true
-                        when split[1] is 'new' and split[2] and !!split[2].match(/^(issue|pull)/)
+                        when split[1] is 'new' and split[2] and !!split[2].match(/^(issue|pull|release)/)
                             ### user/repo new ###
-                            url = "#{split[0]}/#{split[2].match(/^(issue|pull)/)[1]}s/new"
+                            url = "#{split[0]}/#{split[2].match(/^(issue|pull|release)/)[1]}s/new"
                         when !!split[1].match /^(io|pages)$/
                             ### user/repo io ###
                             url = @urls.io(split[0])
@@ -168,7 +170,7 @@ class Omni
                             ### user/repo travis ###
                             url = @urls.travis + split[0]
                             fullPath = true
-                        when !!split[1].match /^(network|contributors|pulls|pulse|issues|settings|graphs|compare|wiki)$/
+                        when !!split[1].match /^(network|contributors|pulls|pulse|issues|settings|graphs|compare|wiki|tags|releases)$/
                             ### user/repo whatever ###
                             url = "#{split[0]}/#{split[1]}/"
                         when !!split[1].match /^#[0-9]+/
