@@ -2,14 +2,16 @@ class Omni
     debug: false
     urls:
         github: 'https://github.com/'
+        api: 'https://api.github.com/'
         travis: 'https://travis-ci.org/'
         clone: 'github-mac://openRepo/https://github.com/'
         search: 'search?q='
         io: (repo) ->
             repo = repo.split('/')
             "http://#{repo[0]}.github.io/#{repo[1]}"
-    api: null
     text: null
+    api: null
+    user: null
     caches:
         my:
             repos: []
@@ -17,9 +19,6 @@ class Omni
         their:
             repos: {}
             user: null
-    account:
-        name: ''
-        pass: ''
 
     constructor: ->
         @setup()
@@ -109,9 +108,9 @@ class Omni
                     when split[1] is 'stars'
                         url = 'stars'
                     when split[1] is 'followers'
-                        url = "#{@account.user}/followers"
+                        url = "#{@user}/followers"
                     when split[1] is 'following'
-                        url = "#{@account.user}/following"
+                        url = "#{@user}/following"
                     when split[1] is 'pulls'
                         url = 'dashboard/pulls'
                     when split[1] is 'issues'
@@ -136,7 +135,7 @@ class Omni
                 ### user/repo ###
                 ### /repo ###
                 if @text[0] is '/'
-                    split[0] = @account.user + split[0]
+                    split[0] = @user + split[0]
                 ### !x ###
                 if @text[0] is '!'
                     split.unshift('##/@@')
@@ -205,32 +204,51 @@ class Omni
 
 
     connect: ->
-        return if !localStorage.username or !localStorage.password
-                
-        @api = new Github
-            username: localStorage.username
-            password: localStorage.password
-            auth: "basic"
+        github = new OAuth2 'github',
+            client_id: '9b3a55174a275a8b56ce'
+            client_secret: 'aea80effa00cc2b98c1cc590ade40ba05cbeea1e'
+            api_scope: 'repo'
+        github.authorize =>
+            # Ready for action, can now make requests with
+            @api = github
 
-        @user = @api.getUser()
+            @query 'user', (err, data) =>
+                @user = data.login
 
-        @getMyRepos()
+            @getMyRepos()
 
     disconnect: ->
-        @api = null
-        @user = null
-        @caches.my = 
-            repos: []
-            orgs: []
+        if @api
+            @api.clearAccessToken()
+
+    query: (url, callback, method = 'GET') ->
+        xhr = new XMLHttpRequest();
+        xhr.onreadystatechange = (event) =>
+          if xhr.readyState is 4
+            if xhr.status is 200
+              data = JSON.parse xhr.responseText
+            else
+              err = xhr
+            callback err, data
+
+        url = "#{@urls.api}#{url}"
+        if @api
+            url = "#{url}?access_token=#{@api.getAccessToken()}"
+
+        xhr.open method.toUpperCase(), url, true
+
+        xhr.setRequestHeader 'Content-Type', 'application/json'
+
+        xhr.send()
 
     getMyRepos: ->
-        @user.repos (err, repos) =>
+        @query 'user/repos', (err, repos) =>
             Array::push.apply @caches.my.repos, repos
 
-        @user.orgs (err, orgs) =>
+        @query 'user/orgs', (err, orgs) =>
             @caches.my.orgs = orgs
             _(orgs).each (org) =>
-                @user.orgRepos org.login, (err, repos) =>
+                @query "orgs/#{org.login}/repos", (err, repos) =>
                     Array::push.apply @caches.my.repos, repos
 
     getTheirRepos: (user, callback) ->
@@ -241,7 +259,7 @@ class Omni
         if @caches.their.repos[user]
             myback()
         else
-            @user.userRepos user, (err, repos) =>
+            @query "users/#{user}/repos", (err, repos) =>
                 @caches.their.repos[user] = repos
                 myback()
 
@@ -266,7 +284,7 @@ class Omni
             if confirm 'Would you like to Authorize Github-Omnibox for personalized suggestions?'
                 @options()
             else
-                alert 'You can authorize at any time by going into Github-Omnibox options'
+                alert 'You can authorize at any time by doing "gh my auth"'
 
 omni = new Omni()
 # omni.debug = true
@@ -277,8 +295,6 @@ chrome.extension.onRequest.addListener (message, sender, sendResponse) ->
     switch message
         when !!'connect'
             omni.connect()
-        when !!'disconnect'
-            omni.disconnect()
 
 # This event is fired each time the user updates the text in the omnibox,
 # as long as the extension's keyword mode is still active.
