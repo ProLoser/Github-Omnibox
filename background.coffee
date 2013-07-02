@@ -23,9 +23,6 @@ class Omni
     constructor: ->
         @setup()
 
-    options: ->
-        chrome.tabs.create({url: "options.html"});
-
     redirect: (url, fullPath) ->
         url = @urls.github + url  unless fullPath
         if @debug
@@ -203,7 +200,7 @@ class Omni
             @redirect url, fullPath
 
 
-    connect: ->
+    authorize: ->
         github = new OAuth2 'github',
             client_id: '9b3a55174a275a8b56ce'
             client_secret: 'aea80effa00cc2b98c1cc590ade40ba05cbeea1e'
@@ -217,7 +214,7 @@ class Omni
 
             @getMyRepos()
 
-    disconnect: ->
+    unauthorize: ->
         if @api
             @api.clearAccessToken()
 
@@ -278,12 +275,13 @@ class Omni
 
     setup: ->
         if localStorage.setup
-            @connect()
-        else
-            localStorage.setup = true
+            @authorize()
+        else if localStorage.setup?
             if confirm 'Would you like to Authorize Github-Omnibox for personalized suggestions?'
-                @options()
+                localStorage.setup = true
+                @authorize()
             else
+                localStorage.setup = false
                 alert 'You can authorize at any time by doing "gh my auth"'
 
 omni = new Omni()
@@ -293,8 +291,8 @@ omni = new Omni()
 # This event is triggered by options.html
 chrome.extension.onRequest.addListener (message, sender, sendResponse) ->
     switch message
-        when !!'connect'
-            omni.connect()
+        when !!'authorize'
+            omni.authorize()
 
 # This event is fired each time the user updates the text in the omnibox,
 # as long as the extension's keyword mode is still active.
