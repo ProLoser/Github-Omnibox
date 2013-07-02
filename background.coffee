@@ -102,10 +102,15 @@ class Omni
                 switch true
                     when split[1] is 'auth'
                         @authorize()
+                        alert 'You can unauthorize at any time by doing "gh my unauth"'
                         url = false
                     when split[1] is 'unauth'
                         @unauthorize()
                         url = false
+                    when split[1] is 'reset'
+                        @reset()
+                        url = false
+                        alert 'Cache has been cleared'
                     when !!split[1].match /^(dash|dashboard|home|news|feed)$/
                         url = ''
                     when split[1] is 'stars'
@@ -213,9 +218,6 @@ class Omni
             client_secret: 'aea80effa00cc2b98c1cc590ade40ba05cbeea1e'
             api_scope: 'repo'
         github.authorize =>
-
-            alert 'You can unauthorize at any time by doing "gh my unauth"'
-
             # Ready for action, can now make requests with token
             @api = github
 
@@ -242,7 +244,7 @@ class Omni
 
         url = "#{@urls.api}#{url}"
         if @api
-            url = "#{url}?access_token=#{@api.getAccessToken()}"
+            url = "#{url}?access_token=#{@api.getAccessToken()}&per_page=1000"
 
         xhr.open method.toUpperCase(), url, true
 
@@ -280,10 +282,18 @@ class Omni
                 content: repo.full_name
         suggestions
 
-    clear: ->
-        # @caches.their =
-        #     repos: []
-        #     user: null
+    reset: ->
+        @caches.my =
+            repos: []
+            orgs: []
+        @cancel()
+        if @api
+            @getMyRepos()
+
+    cancel: ->
+        @caches.their =
+            repos: {}
+            user: null
 
     setup: ->
         if localStorage.setup
@@ -291,6 +301,7 @@ class Omni
         else if localStorage.setup?
             if confirm 'Would you like to Authorize Github-Omnibox for personalized suggestions?'
                 @authorize()
+                alert 'You can unauthorize at any time by doing "gh my unauth"'
             else
                 @unauthorize()
 
@@ -313,7 +324,7 @@ chrome.omnibox.onInputStarted.addListener ->
 
 # This event is fired with the user accepts the input in the omnibox.
 chrome.omnibox.onInputEntered.addListener omni.decide.bind omni
-chrome.omnibox.onInputEntered.addListener omni.clear.bind omni
+# chrome.omnibox.onInputEntered.addListener omni.clear.bind omni
     
 # This event is fired when !!the user cancels the omnibox
-chrome.omnibox.onInputCancelled.addListener omni.clear.bind omni
+# chrome.omnibox.onInputCancelled.addListener omni.clear.bind omni
