@@ -84,11 +84,13 @@ class Omni
 
     getCurrentRepo: (callback) ->
         chrome.tabs.getSelected null, (tab) =>
-            if match = tab.url.match /github\.com\/([\w-]+\/[\w-\.]+)/
-                url = match[1]
+            if match = tab.url.match /github\.com\/(([\w-]+)\/([\w-\.]+))/
+                user = match[2]
+                repo = match[3]
             else if match = tab.url.match /([\w-]+)\.github\.io\/([\w-\.]+)/
-                url = "#{match[1]}/#{match[2]}"
-            callback url 
+                user = match[1]
+                repo = match[2]
+            callback user, repo 
 
     decide: (@text) ->
         split = @text.split(' ')
@@ -141,7 +143,7 @@ class Omni
                             url += 'followers'
                         when split[1] is 'following'
                             url += 'following'
-            when !!@text.match(/^\w+\/[\w-\.]+/), !!@text.match(/^!\w+/), !!@text.match(/^\/[\w-\.]+/)
+            when !!@text.match(/^[\w-]+\/[\w-\.]+/), !!@text.match(/^!\w+/), !!@text.match(/^\/[\w-\.]+/)
                 ### user/repo ###
                 ### /repo ###
                 if @text[0] is '/'
@@ -198,9 +200,9 @@ class Omni
                 if split[0] is '##/@@'
                     newUrl = url
                     url = false
-                    @getCurrentRepo (repo) =>
+                    @getCurrentRepo (user, repo) =>
                         if repo
-                            @redirect newUrl.replace('##', repo.split('/')[0]).replace('@@', repo.split('/')[1]), fullPath
+                            @redirect newUrl.replace('##', user).replace('@@', repo), fullPath
                         else
                             @redirect @urls.search + @text
                 else
