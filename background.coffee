@@ -172,6 +172,8 @@ class Omni
                             ### user/repo travis ###
                             url = @urls.travis + split[0]
                             fullPath = true
+                        when !!split[1].match /^(issues|code)$/ and !!split[2]
+                            url = "#{split[0]}/#{@urls.search}#{split.slice(2).join('+')}&type=#{split[1]}"
                         when !!split[1].match /^(network|contributors|pulls|pulse|issues|settings|graphs|compare|wiki|tags|releases)$/
                             ### user/repo whatever ###
                             url = "#{split[0]}/#{split[1]}/"
@@ -201,10 +203,13 @@ class Omni
                     newUrl = url
                     url = false
                     @getCurrentRepo (user, repo) =>
-                        if repo
-                            @redirect newUrl.replace('##', user).replace('@@', repo), fullPath
+                        if repo and newUrl
+                            url = newUrl.replace('##', user).replace('@@', repo)
+                        else if repo
+                            url = "#{user}/#{repo}/#{@urls.search}#{@text.substr(1)}"
                         else
-                            @redirect @urls.search + @text
+                            url = @urls.search + @text
+                        @redirect url, fullPath
                 else
                     if !url
                         url = "#{split[0]}/"
