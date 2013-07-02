@@ -100,6 +100,12 @@ class Omni
             when !!@text.match /^my/
                 ### my ###
                 switch true
+                    when split[1] is 'auth'
+                        @authorize()
+                        url = false
+                    when split[1] is 'unauth'
+                        @unauthorize()
+                        url = false
                     when !!split[1].match /^(dash|dashboard|home|news|feed)$/
                         url = ''
                     when split[1] is 'stars'
@@ -201,12 +207,16 @@ class Omni
 
 
     authorize: ->
+        localStorage.setup = true
         github = new OAuth2 'github',
             client_id: '9b3a55174a275a8b56ce'
             client_secret: 'aea80effa00cc2b98c1cc590ade40ba05cbeea1e'
             api_scope: 'repo'
         github.authorize =>
-            # Ready for action, can now make requests with
+
+            alert 'You can unauthorize at any time by doing "gh my unauth"'
+
+            # Ready for action, can now make requests with token
             @api = github
 
             @query 'user', (err, data) =>
@@ -217,6 +227,8 @@ class Omni
     unauthorize: ->
         if @api
             @api.clearAccessToken()
+        localStorage.setup = false
+        alert 'You can authorize at any time by doing "gh my auth"'
 
     query: (url, callback, method = 'GET') ->
         xhr = new XMLHttpRequest();
@@ -278,11 +290,9 @@ class Omni
             @authorize()
         else if localStorage.setup?
             if confirm 'Would you like to Authorize Github-Omnibox for personalized suggestions?'
-                localStorage.setup = true
                 @authorize()
             else
-                localStorage.setup = false
-                alert 'You can authorize at any time by doing "gh my auth"'
+                @unauthorize()
 
 omni = new Omni()
 # omni.debug = true
