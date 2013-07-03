@@ -5,43 +5,43 @@ var patterns = {
     my: {
         children: {
             issues: {
-                shorthand: "straightForward", // look in "Step" class definition
+                shorthand: "straightFwd", // look in "Step" class definition
                 url: "dashboard/issues"
             },
             dash: {
-                shorthand: "straightForward",
+                shorthand: "straightFwd",
                 url: ""
             },
             pulls: {
-                shorthand: "straightForward",
+                shorthand: "straightFwd",
                 url: "dashboard/pulls"
             },
             stars: {
-                shorthand: "straightForward",
+                shorthand: "straightFwd",
                 url: "stars"
             },
             settings: {
-                shorthand: "straightForward",
+                shorthand: "straightFwd",
                 url: "dashboard/settings"
             },
             followers: {
-                shorthand: "straightForward",
+                shorthand: "straightFwd",
                 url: "<%= user.name %>/followers"
             },
             following: {
-                shorthand: "straightForward",
+                shorthand: "straightFwd",
                 url: "<%= user.name %>/following"
             },
             starred: {
-                shorthand: "straightForward",
+                shorthand: "straightFwd",
                 url: "stars"
             },
             repositories: {
-                shorthand: "straightForward",
+                shorthand: "straightFwd",
                 url: "<%= user.name %>/?tab=repositories"
             },
             activities: {
-                shorthand: "straightForward",
+                shorthand: "straightFwd",
                 url: "<%= user.name %>/?tab=activity"
             }
         }
@@ -64,39 +64,39 @@ var patterns = {
                 }
             },
             pulls: {
-                shorthand: "straightForward",
+                shorthand: "straightFwd",
                 url: "<%= user.name %>/<$= repo.name %>/pulls"
             },
             network: {
-                shorthand: "straightForward",
+                shorthand: "straightFwd",
                 url: "<%= user.name %>/<$= repo.name %>/network"
             },
             pulse: {
-                shorthand: "straightForward",
+                shorthand: "straightFwd",
                 url: "<%= user.name %>/<$= repo.name %>/pulse"
             },
             settings: {
-                shorthand: "straightForward",
+                shorthand: "straightFwd",
                 url: "<%= user.name %>/<$= repo.name %>/settings"
             },
             issues: {
-                shorthand: "straightForward",
+                shorthand: "straightFwd",
                 url: "<%= user.name %>/<$= repo.name %>/issues"
             },
             contributors: {
-                shorthand: "straightForward",
+                shorthand: "straightFwd",
                 url: "<%= user.name %>/<$= repo.name %>/contributors"
             },
             compare: {
-                shorthand: "straightForward",
+                shorthand: "straightFwd",
                 url: "<%= user.name %>/<$= repo.name %>/compare"
             },
             wiki: {
-                shorthand: "straightForward",
+                shorthand: "straightFwd",
                 url: "<%= user.name %>/<$= repo.name %>/wiki"
             },
             graphs: {
-                shorthand: "straightForward",
+                shorthand: "straightFwd",
                 url: "<%= user.name %>/<$= repo.name %>/graphs"
             },
             '#': { // TODO
@@ -311,7 +311,7 @@ var patterns = {
 var Step = (function () {
 
     var StepValueShorthand = {
-        straightForward: function (value, aStep) {
+        straightFwd: function (value, aStep) {
             var steps = [];
             do {
                 steps.unshift(aStep.label);
@@ -335,14 +335,13 @@ var Step = (function () {
     function Step(label, value, level, parent) {
         this.label = label;
         this.level = level;
+        this.parent = parent || null;
 
         if (value.shorthand && StepValueShorthand[value.shorthand]) {
             this.value = StepValueShorthand[value.shorthand](value, this);
         } else {
             this.value = value;
         }
-
-        this.parent = parent;
 
         this.pattern = value.pattern || label;
         this.children = [];
@@ -363,50 +362,61 @@ var Step = (function () {
             if (isRegExp(this.pattern)) {
                 return this.pattern.test(args[this.level]);
             } else {
-                return this.pattern !== args[this.level];
+                return this.pattern === args[this.level];
             }
         },
         startsWith: function (args/*, text*/) {
             if (isRegExp(this.pattern)) {
                 return this.pattern.test(args[this.level]);
             } else {
-                return this.pattern.indexOf(args[this.level]) != -1;
+                return this.pattern.indexOf(args[this.level]) === 0;
             }
         },
-
-        canSuggest: function (args/*, text*/) {
-            return this.level <= args.length;
-        },
-
 
         suggest: function (args, text) {
             var suggestions = [];
-            if (this.level === args.length) {
-                if (this.value.suggest) {
-                    return this.value.suggest(args, text);
+            if (this.level === args.size0) {
+                if (this.startsWith(args) && this.value.suggest) {
+                    suggestions = suggestions.concat(this.value.suggest(args, text));
                 }
-            } else if(this.level < args.length) {
-                forEach(this.value.children, function (childStep) {
-                    suggestions = suggestions.concat(childStep.suggest(args, text));
-                });
-            }
+                suggestions = suggestions.concat(this.getChildSuggest(args, text));
 
+            } else if (this.level < args.size0) {
+                if (this.match(args)) {
+                    suggestions = suggestions.concat(this.getChildSuggest(args, text));
+                    if (this.value.suggest) {
+                        suggestions = suggestions.concat(this.value.suggest(args, text));
+                    }
+                }
+            }
             return suggestions;
-
-            /*var suggestions = this.value.suggest ? this.value.suggest(args, text) : [];
-             forEach(this.value.children, function (childStep) {
-             suggestions = suggestions.concat(childStep.suggest(args, text));
-             });
-             return suggestions;*/
         },
+        getChildSuggest: function (args, text) {
+            var suggestions = [];
+            forEach(this.children, function (childStep) {
+                suggestions = suggestions.concat(childStep.suggest(args, text));
+            });
+            return suggestions;
+        },
+
         decide: function (args, text) {
-            if (this.level === args.length) {
-                if (this.value.decide) {
-                    return this.value.decide(args, text);
-                } else {
-                    return null;
+            var childDecision;
+            if (this.match(args)) {
+                if (this.level === args.size0) {
+                    if (this.value.decide) {
+                        return this.value.decide(args, text);
+                    }
+                } else if (this.level < args.size0) {
+                    for (var i = 0; i < this.children.length; i++) {
+                        childDecision = this.children[i].decide(args, text);
+                        console.log(childDecision);
+                        if (childDecision) {
+                            return childDecision;
+                        }
+                    }
                 }
             }
+            return null;
         }
     };
 
@@ -421,8 +431,25 @@ var StepManager = (function () {
     return {
         loadPatterns: function (patterns) {
             forEach(patterns, function (value, key) {
-                steps.push(new Step(key, value, 1, null));
+                steps.push(new Step(key, value, 0));
             });
+        },
+        suggest: function (args, text) {
+            var suggestions = [];
+            forEach(steps, function (aStep) {
+                suggestions = suggestions.concat(aStep.suggest(args, text));
+            });
+            return suggestions;
+        },
+        decide: function (args, text) {
+            var decision;
+            for (var i = 0; i < steps.length; i++) {
+                decision = steps[i].decide(args, text);
+                if (decision) {
+                    return decision;
+                }
+            }
+            return null;
         }
     }
 
@@ -430,70 +457,13 @@ var StepManager = (function () {
 
 StepManager.loadPatterns(patterns);
 
-var suggest = (function () {
-    function suggest(text) {
-        var args = text.split(' ');
+var text = "my s";
+var args = text.split(' ');
+args.size0 = args.length - 1;
 
-        loopThroughPatterns(patterns, function (value, key, road) {
-            if (args.length <= road.length && matchRoad(args, road)) {
-                console.log(!!value.decide, joinRoad(road));
-            }
-        });
-    }
+console.log("Looking or deciding for:", text);
+console.log(StepManager.suggest(args, text));
 
-
-    return suggest;
-
-    function joinRoad(road) {
-        var labels = [];
-        forEach(road, function (val) {
-            labels.push(val.label);
-        });
-        return labels.join('.');
-    }
-
-    /*function isEmptyObject(obj) {
-     for(var key in obj) {
-     if(obj.hasOwnProperty(key)) {
-     return false;
-     }
-     }
-     return true;
-     }*/
-
-    function loopThroughPatterns(obj, iterator, context, _road) {
-        _road = _road || [];
-        forEach(obj, function (value, key) {
-            var road;
-            if (isObject(value)) {
-                road = _road.concat([
-                    {
-                        label: key,
-                        value: value,
-                        pattern: value.pattern || key
-                    }
-                ]);
-
-                if (iterator.call(this, value, key, road) !== false) {
-                    loopThroughPatterns(value.children, iterator, this, road);
-                }
-            }
-        }, context);
-    }
-
-    function matchRoad(args, road) {
-        var lastIndex = args.length - 1;
-        for (var i = 0, ii = lastIndex - 1; i <= ii; i++) {
-            if (isRegExp(road[i].pattern) ? !road[i].pattern.test(args[i]) : road[i].pattern !== args[i]) {
-                return false;
-            }
-        }
-        return isRegExp(road[lastIndex].pattern) ? !!road[lastIndex].pattern.test(args[lastIndex]) : road[lastIndex].pattern.indexOf(args[lastIndex]) != -1;
-    }
-
-}());
-
-suggest('rodyhaddad/dsahb');
 
 // I wasn't using underscore
 function isArray(arr) {
