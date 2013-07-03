@@ -275,18 +275,7 @@ class Omni
             # Ready for action, can now make requests with token
             @api = github
 
-            @query 'user', (err, data) =>
-                @user = data.login
-
-            @query 'gists', (err, data) =>
-                Array::push.apply @caches.my.gists, data
-            @query 'gists/starred', (err, data) =>
-                Array::push.apply @caches.my.gists, data
-
-            @query 'user/following', (err, data) =>
-                @caches.my.following = data
-
-            @getMyRepos()
+            @reset()
 
     unauthorize: ->
         if @api
@@ -340,9 +329,25 @@ class Omni
         @caches.my =
             repos: []
             orgs: []
+            following: []
+            gists: []
         @cancel()
+
+        @query 'gists', (err, data) =>
+            Array::push.apply @caches.my.gists, data
+        @query 'gists/starred', (err, data) =>
+            Array::push.apply @caches.my.gists, data
+
+        @query 'user/following', (err, data) =>
+            @caches.my.following = data
+
+        @getMyRepos()
+
         if @api
             @getMyRepos()
+            @query 'user', (err, data) =>
+                @user = data.login
+
 
     cancel: ->
         @caches.their =
