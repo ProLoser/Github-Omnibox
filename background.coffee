@@ -44,7 +44,9 @@ class Omni
         defaultSuggestion = null
         _.each collection, (item) =>
             match = item.content.toLowerCase().indexOf(search.toLowerCase())
-            results.push item if anywhere and ~match or !match
+            if anywhere and ~match or !match
+                # item.description = item.description.split(search).join("<match>#{search}</match>")
+                results.push item
             defaultSuggestion = item.description if search is item.content
         @setDefault defaultSuggestion
         results
@@ -79,7 +81,7 @@ class Omni
                 when @text[0] is '@', !!@text.match /[\w-]+\/ /
                     ### @user ###
                     ### 'user/ ' ###
-                    @powerPush suggestions, "#{split[0]} ", @actions.user
+                    @powerPush suggestions, "#{split[0]} ", @actions.user, "<dim>user</dim> #{split[0]} "
                 when !!@text.match /^\w+\/[\w-\.]+ /
                     ### 'user/repo ' ###
                     @powerPush suggestions, "#{split[0]} new ", @actions.new
@@ -307,7 +309,7 @@ class Omni
         suggestions = []
         _(repos).each (repo) =>
             suggestions.push
-                description: repo.full_name
+                description: "<dim>repo</dim> #{repo.full_name}"
                 content: repo.full_name
         suggestions
 
