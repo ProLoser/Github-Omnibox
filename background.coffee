@@ -21,6 +21,7 @@ class Omni
         my:
             repos: []
             orgs: []
+            following: []
         their:
             repos: {}
             user: null
@@ -78,10 +79,13 @@ class Omni
             @powerPush suggestions, "my new ", ['repo'], '<dim>my</dim> new '
                 
             switch true
-                when @text[0] is '@', !!@text.match /[\w-]+\/ /
-                    ### @user ###
+                when !!@text.match /@[\w-]+ /, !!@text.match /[\w-]+\/ /
+                    ### '@user ' ###
                     ### 'user/ ' ###
                     @powerPush suggestions, "#{split[0]} ", @actions.user, "<dim>user</dim> #{split[0]} "
+                when @text[0] is '@'
+                    ### @user ###
+                    @powerPush suggestions, "@", _.pluck(@caches.my.following, 'login'), "<dim>user</dim> @"
                 when !!@text.match /^\w+\/[\w-\.]+ /
                     ### 'user/repo ' ###
                     @powerPush suggestions, "#{split[0]} new ", @actions.new
@@ -89,13 +93,14 @@ class Omni
                 when !!@text.match /^\w+\//
                     ### user/ ###
                     @getTheirRepos split[0].split('/')[0], (repos) =>
-                        @suggester @filter @text, @suggestionsFromRepos repos
+                        @suggester @filter @text, @powerPush [], _.pluck(repos, 'full_name'), '<dim>repo</dim> '
                 when !!@text.match /^\/[\w-\.]*/
                     ### /repo ###
                     Array::unshift.apply suggestions, @suggestionsFromRepos @caches.my.repos
                     @suggester @filter @text, suggestions, true
                     return
             @suggester @filter @text, suggestions
+
 
     powerPush: (destination, prefix = '', source, descriptionPrefix = prefix) ->
         Array::unshift.apply destination, _.map source, (item) =>
@@ -255,6 +260,9 @@ class Omni
             @query 'user', (err, data) =>
                 @user = data.login
 
+            @query 'user/following', (err, data) =>
+                @caches.my.following = data
+
             @getMyRepos()
 
     unauthorize: ->
@@ -304,14 +312,6 @@ class Omni
             @query "users/#{user}/repos", (err, repos) =>
                 @caches.their.repos[user] = repos
                 myback()
-
-    suggestionsFromRepos: (repos) ->
-        suggestions = []
-        _(repos).each (repo) =>
-            suggestions.push
-                description: "<dim>repo</dim> #{repo.full_name}"
-                content: repo.full_name
-        suggestions
 
     reset: ->
         @caches.my =
