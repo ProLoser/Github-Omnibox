@@ -13,8 +13,8 @@ class Omni
     api: null
     user: null
     actions:
-        'user': ['followers', 'following', 'starred', 'repositories', 'activities']
-        'my': ['issues', 'dash', 'pulls', 'stars', 'settings']
+        'user': ['followers', 'following', 'starred', 'repositories', 'activity']
+        'my': ['issues', 'dash', 'pulls', 'settings']
         'new': ['issue', 'release']
         'repo': ['io', 'pulls', 'network', 'pulse', 'settings', 'issues', 'contributors', 'compare', 'wiki', 'graphs', '#', 'tags', 'releases']
     caches:
@@ -115,34 +115,32 @@ class Omni
                         @reset()
                         url = false
                         alert 'Cache has been cleared'
-                    when !!split[1].match /^(dash|dashboard|home|news|feed)$/
+                    when !!~['dash', 'dashboard', 'home', 'news', 'feed'].indexOf(split[1])
                         url = ''
-                    when split[1] is 'stars'
+                    when !!~['stars', 'starred'].indexOf(split[1])
                         url = 'stars'
-                    when split[1] is 'followers'
-                        url = "#{@user}/followers"
-                    when split[1] is 'following'
-                        url = "#{@user}/following"
-                    when split[1] is 'pulls'
-                        url = 'dashboard/pulls'
-                    when split[1] is 'issues'
-                        url = "dashboard/issues"
-                    when split[1] is 'stars'
-                        url = "dashboard/stars?q=#{split.slice(2).join(' ')}"
-                    when split[1] is 'settings'
-                        url = 'dashboard/settings'
+                        if split[2]
+                            url += "?q=#{split.slice(2).join(' ')}"
+                    when !!~['following', 'followers'].indexOf(split[1])
+                        url = "#{@user}/#{split[1]}"
+                    when !!~['pulls', 'issues', 'settings'].indexOf(split[1])
+                        url = "dashboard/#{split[1]}"
+                    when !!~['repositories', 'activity'].indexOf(split[1])
+                        url = "#{@user}?tab=#{split[1]}"
+                    when !split[1]
+                        url = @user
             when !!@text.match /^@\w+/
                 ### @user ###
                 url = "#{split[0].substr(1)}/"
                 if split[1]
                     ### @user whatever ###
                     switch true
-                        when split[1] is 'stars'
+                        when split[1] is 'starred'
                             url += 'following#starred'
-                        when split[1] is 'followers'
-                            url += 'followers'
-                        when split[1] is 'following'
-                            url += 'following'
+                        when !!~['repositories', 'activity'].indexOf(split[1])
+                            url += "?tab=#{split[1]}"
+                        when !!~['followers', 'following'].indexOf(split[1])
+                            url += split[1]
             when !!@text.match(/^[\w-]+\/[\w-\.]+/), !!@text.match(/^!\w+/), !!@text.match(/^\/[\w-\.]+/)
                 ### user/repo ###
                 ### /repo ###
@@ -159,7 +157,7 @@ class Omni
                     switch true
                         when split[1] is 'new' and split[2] and !!split[2].match(/^(issue|pull|release)/)
                             ### user/repo new ###
-                            url = "#{split[0]}/#{split[2].match(/^(issue|pull|release)/)[1]}s/new"
+                            url = "#{split[0]}/#{split[2]}s/new"
                         when !!split[1].match /^(io|pages)$/
                             ### user/repo io ###
                             url = @urls.io(split[0])
@@ -174,11 +172,11 @@ class Omni
                             fullPath = true
                         when !!split[1].match /^(issues|code)$/ and !!split[2]
                             url = "#{split[0]}/#{@urls.search}#{split.slice(2).join('+')}&type=#{split[1]}"
-                        when !!split[1].match /^(network|contributors|pulls|pulse|issues|settings|graphs|compare|wiki|tags|releases)$/
-                            ### user/repo whatever ###
-                            url = "#{split[0]}/#{split[1]}/"
                         when !!split[1].match /^#[0-9]+/
                             url = "#{split[0]}/issues/#{split[1].substr(1)}"
+                        when !!~@actions.repo.indexOf(split[1])
+                            ### user/repo whatever ###
+                            url = "#{split[0]}/#{split[1]}/"
                         when !!split[1].match(/^@/), !!split[1].match /^\/.*/
                             ### user/repo @branch ###
                             ### user/repo /path ###
