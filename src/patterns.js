@@ -247,7 +247,7 @@ var patterns = {
 
                 }
             },
-            whatever: {
+            actions: {
                 pattern: /^(network|contributors|pulls|pulse|issues|settings|graphs|compare|wiki)$/,
                 suggest: function (args) {
 
@@ -307,11 +307,29 @@ var patterns = {
     }
 };
 
-//Represent an "arg"
+/**
+ * What a "Step" is:
+ *
+ * imagine in our patterns, there is "my issues",
+ * then "my" is represented as a Step, with "issues" as a child Step
+ *
+ * Each Step know it's label (can be "my" or "issues" here), it also knows about
+ * - it's parent
+ * - it's children
+ * - it's level (issues' level is 1 here)
+ * - it's pattern (regex or string)
+ * - it's value (which is the original object that is specified in the patterns object up there)
+ *      I use the value to get the "suggest" and "decide" function for example
+ *      Also, any "match" or "startsWith" function on the value overwrites the default ones
+ *
+ */
 var Step = (function () {
 
+    //to not be repetitive
     var StepValueShorthand = {
         straightFwd: function (value, aStep) {
+            //getting the "road" to get to this step
+            //so here we're constructing the string "my issues"
             var steps = [];
             do {
                 steps.unshift(aStep.label);
@@ -358,6 +376,8 @@ var Step = (function () {
     }
 
     Step.prototype = {
+        // does this Step match those args?
+        // only called when parent matches too
         match: function (args/*, text*/) {
             if (isRegExp(this.pattern)) {
                 return this.pattern.test(args[this.level]);
@@ -365,6 +385,7 @@ var Step = (function () {
                 return this.pattern === args[this.level];
             }
         },
+        // only called when parent matches too
         startsWith: function (args/*, text*/) {
             if (isRegExp(this.pattern)) {
                 return this.pattern.test(args[this.level]);
@@ -373,6 +394,7 @@ var Step = (function () {
             }
         },
 
+        // gives suggestions for self and children (if there are still other args, children come first)
         suggest: function (args, text) {
             var suggestions = [];
             if (this.level === args.size0) {
@@ -391,6 +413,7 @@ var Step = (function () {
             }
             return suggestions;
         },
+        //gives the suggestions of children
         getChildSuggest: function (args, text) {
             var suggestions = [];
             forEach(this.children, function (childStep) {
@@ -399,6 +422,7 @@ var Step = (function () {
             return suggestions;
         },
 
+        //gives the decision of self, or children if there are other args
         decide: function (args, text) {
             var childDecision;
             if (this.match(args)) {
@@ -407,9 +431,9 @@ var Step = (function () {
                         return this.value.decide(args, text);
                     }
                 } else if (this.level < args.size0) {
+
                     for (var i = 0; i < this.children.length; i++) {
                         childDecision = this.children[i].decide(args, text);
-                        console.log(childDecision);
                         if (childDecision) {
                             return childDecision;
                         }
@@ -454,18 +478,22 @@ var StepManager = (function () {
     }
 
 }());
-
 StepManager.loadPatterns(patterns);
+
+
+//Testing if it works (I'm using node)
 
 var text = "my s";
 var args = text.split(' ');
+//size0 is the length, starting from 0 instead of 1
 args.size0 = args.length - 1;
 
-console.log("Looking or deciding for:", text);
+console.log("Suggesting or deciding for:", text);
+
 console.log(StepManager.suggest(args, text));
 
 
-// I wasn't using underscore
+// I wasn't using underscore, will switch later if needed
 function isArray(arr) {
     return Object.prototype.toString.call(arr) === "[object Array]";
 }
