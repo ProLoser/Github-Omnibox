@@ -99,11 +99,11 @@ class Omni
                 when !!@text.match /^\w+\//
                     ### user/ ###
                     @getTheirRepos split[0].split('/')[0], (repos) =>
-                        @suggester @filter @text, @powerPush [], _.pluck(repos, 'full_name'), '<dim>repo</dim> '
+                        @suggester @filter @text, @powerPush([], null, _.pluck(repos, 'full_name'), '<dim>repo</dim> '), true
+                    return
                 when !!@text.match /^\/[\w-\.]*/
                     ### /repo ###
-                    Array::unshift.apply suggestions, @suggestionsFromRepos @caches.my.repos
-                    @suggester @filter @text, suggestions, true
+                    @suggester @filter @text, @powerPush([], null, _.pluck(@caches.my.repos, 'full_name'), '<dim>repo</dim> '), true
                     return
             @suggester @filter @text, suggestions
 
@@ -112,6 +112,7 @@ class Omni
         Array::unshift.apply destination, _.map source, (item) =>
             description: descriptionPrefix + item
             content: prefix + item
+        destination
 
     getCurrentRepo: (callback) ->
         chrome.tabs.getSelected null, (tab) =>
