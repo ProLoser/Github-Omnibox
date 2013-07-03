@@ -2,6 +2,7 @@ class Omni
     debug: false
     urls:
         github: 'https://github.com/'
+        gist: 'https://gist.github.com/'
         api: 'https://api.github.com/'
         travis: 'https://travis-ci.org/'
         clone: 'github-mac://openRepo/https://github.com/'
@@ -22,6 +23,7 @@ class Omni
             repos: []
             orgs: []
             following: []
+            gists: []
         their:
             repos: {}
             user: null
@@ -62,6 +64,7 @@ class Omni
             { content: '/', description: '<dim>search for my</dim> <match>/</match><url>repo</url>' }
             { content: '!', description: '<dim>this repo</dim> <match>!</match><url>action</url>' }
             { content: 'my ', description: '<dim>my account</dim> <match>my</match> <url>action</url>' }
+            { content: 'gist ', description: '<dim>gists</dim> <match>gist</match> <url>id</url>' }
             { content: '@', description: '<dim>user actions</dim> <match>@</match><url>user</url>' }
         ]
 
@@ -79,6 +82,9 @@ class Omni
             @powerPush suggestions, "my new ", ['repo'], '<dim>my</dim> new '
                 
             switch true
+                when !!@text.match /gist ?/
+                    ### 'gist ' ###
+                    Array::unshift.apply suggestions, @suggestionsFromGists @caches.my.gists
                 when !!@text.match /@[\w-]+ /, !!@text.match /[\w-]+\/ /
                     ### '@user ' ###
                     ### 'user/ ' ###
@@ -117,9 +123,21 @@ class Omni
                 repo = match[2]
             callback user, repo 
 
+    suggestionsFromGists: (gists) ->
+        suggestions = []
+        _.each gists, (gist) =>
+            suggestions.push
+                content: "gist #{gist.user.login}/#{gist.id}"
+                description: "gist <url>#{gist.user.login}/#{gist.id}</url>: <dim>#{gist.description?.split('&').join('&amp;')}</dim>"
+        suggestions
+
     decide: (@text) ->
         split = @text.split(' ')
         switch true
+            when split[0] is 'gist' and !!(match = split[1].match /^([\w-]+\/)?([0-9]+)$/)
+                ### gist x ###
+                url = "#{@urls.gist}#{match[1]}#{match[2]}"
+                fullPath = true
             when !!@text.match /^my/
                 ### my ###
                 switch true
@@ -259,6 +277,11 @@ class Omni
 
             @query 'user', (err, data) =>
                 @user = data.login
+
+            @query 'gists', (err, data) =>
+                Array::push.apply @caches.my.gists, data
+            @query 'gists/starred', (err, data) =>
+                Array::push.apply @caches.my.gists, data
 
             @query 'user/following', (err, data) =>
                 @caches.my.following = data
