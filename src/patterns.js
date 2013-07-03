@@ -26,11 +26,11 @@ var patterns = {
             },
             followers: {
                 shorthand: "straightFwd",
-                url: "<%= user.name %>/followers"
+                url: "<%= gh.user.name %>/followers"
             },
             following: {
                 shorthand: "straightFwd",
-                url: "<%= user.name %>/following"
+                url: "<%= gh.user.name %>/following"
             },
             starred: {
                 shorthand: "straightFwd",
@@ -38,11 +38,31 @@ var patterns = {
             },
             repositories: {
                 shorthand: "straightFwd",
-                url: "<%= user.name %>/?tab=repositories"
+                url: "<%= gh.user.name %>/?tab=repositories"
             },
             activities: {
                 shorthand: "straightFwd",
-                url: "<%= user.name %>/?tab=activity"
+                url: "<%= gh.user.name %>/?tab=activity"
+            },
+            testing: {
+                suggest: function () {
+                    var defer = Defer();
+                    setTimeout(function () {
+                        defer.resolve({content: 2, description: 2})
+                    }, 2000);
+                    return [
+                        {content: 1, description: 1},
+                        defer,
+                        {content: 3, description: 3}
+                    ];
+                },
+                decide: function () {
+                    var defer = Defer();
+                    setTimeout(function () {
+                        defer.resolve("WORKS")
+                    }, 2000);
+                    return defer;
+                }
             }
         }
     },
@@ -480,19 +500,6 @@ var StepManager = (function () {
 }());
 StepManager.loadPatterns(patterns);
 
-
-//Testing if it works (I'm using node)
-
-var text = "my s";
-var args = text.split(' ');
-//size0 is the length, starting from 0 instead of 1
-args.size0 = args.length - 1;
-
-console.log("Suggesting or deciding for:", text);
-
-console.log(StepManager.suggest(args, text));
-
-
 // I wasn't using underscore, will switch later if needed
 function isArray(arr) {
     return Object.prototype.toString.call(arr) === "[object Array]";
@@ -523,3 +530,72 @@ function forEach(obj, iterator, context) {
     }
     return obj;
 }
+
+
+function Defer() {
+    if (!(this instanceof Defer)) {
+        return new Defer();
+    }
+    this.resolved = false;
+    this.resolveValue = null;
+    this.cb = null;
+}
+
+Defer.eachDone = function (value, eachDone) {
+    if (isArray(value)) {
+        forEach(value, function (value, index) {
+            if (value instanceof Defer) {
+                value.done(function (value) {
+                    eachDone(value, index);
+                });
+            } else {
+                eachDone(value, index);
+            }
+        });
+    } else {
+        if (value instanceof Defer) {
+            value.done(eachDone);
+        } else {
+            eachDone(value);
+        }
+    }
+};
+
+Defer.prototype = {
+    resolve: function (value) {
+        this.resolveValue = value;
+        if (this.cb) {
+            forEach(this.cb, function (cb) {
+                cb(value);
+            });
+        }
+    },
+    done: function (cb) {
+        if (this.resolved) {
+            var resolveValue = this.resolveValue;
+            setTimeout(function () {
+                cb(resolveValue);
+            }, 0)
+        } else {
+            if (!this.cb) {
+                this.cb = [cb];
+            } else {
+                this.cb.push(cb);
+            }
+        }
+    }
+};
+
+
+//Testing if it works (I'm using node)
+
+var text = "my t";
+var args = text.split(' ');
+//size0 is the length, starting from 0 instead of 1
+args.size0 = args.length - 1;
+
+console.log("Suggesting or deciding for:", text);
+
+Defer.eachDone(StepManager.suggest(args, text), function (value, index) {
+    console.log(index, value);
+});
