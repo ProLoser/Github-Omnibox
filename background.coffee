@@ -26,7 +26,8 @@ class Omni
             user: null
 
     constructor: ->
-        @setup()
+        if localStorage.setup is 'true'
+            @authorize()
 
     redirect: (url, fullPath) ->
         url = @urls.github + url  unless fullPath
@@ -40,42 +41,61 @@ class Omni
     filter: (search, collection, anywhere) ->
         return collection  unless search
         results = []
+        defaultSuggestion = null
         _.each collection, (item) =>
             match = item.content.toLowerCase().indexOf(search.toLowerCase())
-            results.push item if anywhere and ~match or !match
-            @setDefault item.description if search is item.content
+            if anywhere and ~match or !match
+                # item.description = item.description.split(search).join("<match>#{search}</match>")
+                results.push item
+            defaultSuggestion = item.description if search is item.content
+        @setDefault defaultSuggestion
         results
 
-    setDefault: (description) ->
+    setDefault: (description = '<dim>search for</dim> "<match>%s</match>"') ->
         chrome.omnibox.setDefaultSuggestion description: description
 
     suggest: (@text, @suggester) ->
         split = @text.split(' ')
-        suggestions = []
-        @powerPush suggestions, "my ", @actions.my
-        @powerPush suggestions, "my ", @actions.user
-        @powerPush suggestions, "!", @actions.repo, 'this repo '
-        @powerPush suggestions, "!new ", @actions.new, 'this repo '
-        @powerPush suggestions, "new ", ['repo']
-            
-        switch true
-            when !!@text.match /^@\w+/
-                ### @user ###
-                @powerPush suggestions, "#{split[0]} ", @actions.user
-            when !!@text.match /^\w+\/[\w-\.]+ /
-                ### 'user/repo ' ###
-                @powerPush suggestions, "#{split[0]} new ", @actions.new
-                @powerPush suggestions, "#{split[0]} ", @actions.repo
-            when !!@text.match /^\w+\//
-                ### user/ ###
-                @getTheirRepos split[0].split('/')[0], (repos) =>
-                    @suggester @filter @text, @suggestionsFromRepos repos
-            when !!@text.match /^\/[\w-\.]*/
-                ### /repo ###
-                Array::unshift.apply suggestions, @suggestionsFromRepos @caches.my.repos
-                @suggester @filter @text, suggestions, true
-                return
-        @suggester @filter @text, suggestions
+        suggestions = [
+            { content: '', description: '<dim>jump to </dim> <url>user</url><match>/</match><url>repo</url>' }
+            { content: '/', description: '<dim>search for my</dim> <match>/</match><url>repo</url>' }
+            { content: '!', description: '<dim>this repo</dim> <match>!</match><url>action</url>' }
+            { content: 'my ', description: '<dim>my account</dim> <match>my</match> <url>action</url>' }
+            { content: '@', description: '<dim>user actions</dim> <match>@</match><url>user</url>' }
+        ]
+
+        if !@text or @text is 'help'
+            @setDefault()
+            @suggester suggestions
+        else
+            suggestions.push { content: 'my auth', description: '<dim>github omnibox</dim> <url>authorize with github</url>' } if localStorage.setup is 'false'
+            suggestions.push { content: 'my unauth', description: '<dim>github omnibox</dim> <url>unauthorize from github</url>' } if localStorage.setup is 'true'
+            suggestions.push { content: 'my reset', description: '<dim>github omnibox</dim> <url>reset cache</url>' }
+            @powerPush suggestions, "my ", @actions.my, '<dim>my</dim> '
+            @powerPush suggestions, "my ", @actions.user, '<dim>my</dim> '
+            @powerPush suggestions, "!", @actions.repo, '<dim>this repo</dim> '
+            @powerPush suggestions, "!new ", @actions.new, '<dim>this repo</dim> '
+            @powerPush suggestions, "my new ", ['repo'], '<dim>my</dim> new '
+                
+            switch true
+                when @text[0] is '@', !!@text.match /[\w-]+\/ /
+                    ### @user ###
+                    ### 'user/ ' ###
+                    @powerPush suggestions, "#{split[0]} ", @actions.user, "<dim>user</dim> #{split[0]} "
+                when !!@text.match /^\w+\/[\w-\.]+ /
+                    ### 'user/repo ' ###
+                    @powerPush suggestions, "#{split[0]} new ", @actions.new
+                    @powerPush suggestions, "#{split[0]} ", @actions.repo
+                when !!@text.match /^\w+\//
+                    ### user/ ###
+                    @getTheirRepos split[0].split('/')[0], (repos) =>
+                        @suggester @filter @text, @suggestionsFromRepos repos
+                when !!@text.match /^\/[\w-\.]*/
+                    ### /repo ###
+                    Array::unshift.apply suggestions, @suggestionsFromRepos @caches.my.repos
+                    @suggester @filter @text, suggestions, true
+                    return
+            @suggester @filter @text, suggestions
 
     powerPush: (destination, prefix = '', source, descriptionPrefix = prefix) ->
         Array::unshift.apply destination, _.map source, (item) =>
@@ -95,15 +115,12 @@ class Omni
     decide: (@text) ->
         split = @text.split(' ')
         switch true
-            when split[0] is 'new'
-                ### new whatever ###
-                switch true
-                    when split[1] is 'repo'
-                        ### new repo ###
-                        url = 'new'
             when !!@text.match /^my/
                 ### my ###
                 switch true
+                    when split[1] is 'new' and split[2] is 'repo'
+                        ### new repo ###
+                        url = 'new'
                     when split[1] is 'auth'
                         @authorize()
                         alert 'You can unauthorize at any time by doing "gh my unauth"'
@@ -129,9 +146,14 @@ class Omni
                         url = "#{@user}?tab=#{split[1]}"
                     when !split[1]
                         url = @user
-            when !!@text.match /^@\w+/
-                ### @user ###
-                url = "#{split[0].substr(1)}/"
+            when split[0][0] is '@', !!split[0].match /[\w-]+\//
+                if split[0][0] is '@'
+                    ### @user ###
+                    url = "#{split[0].substr(1)}/"
+                else
+                    ### user/ ###
+                    url = split[0]
+
                 if split[1]
                     ### @user whatever ###
                     switch true
@@ -219,12 +241,14 @@ class Omni
 
 
     authorize: ->
-        localStorage.setup = true
+        localStorage.setup = 'false'
         github = new OAuth2 'github',
             client_id: '9b3a55174a275a8b56ce'
             client_secret: 'aea80effa00cc2b98c1cc590ade40ba05cbeea1e'
             api_scope: 'repo'
         github.authorize =>
+            localStorage.setup = 'true'
+
             # Ready for action, can now make requests with token
             @api = github
 
@@ -236,7 +260,7 @@ class Omni
     unauthorize: ->
         if @api
             @api.clearAccessToken()
-        localStorage.setup = false
+        localStorage.setup = 'false'
         alert 'You can authorize at any time by doing "gh my auth"'
 
     query: (url, callback, method = 'GET') ->
@@ -285,7 +309,7 @@ class Omni
         suggestions = []
         _(repos).each (repo) =>
             suggestions.push
-                description: repo.full_name
+                description: "<dim>repo</dim> #{repo.full_name}"
                 content: repo.full_name
         suggestions
 
@@ -303,9 +327,7 @@ class Omni
             user: null
 
     setup: ->
-        if localStorage.setup
-            @authorize()
-        else if localStorage.setup?
+        if !localStorage.setup
             if confirm 'Would you like to Authorize Github-Omnibox for personalized suggestions?'
                 @authorize()
                 alert 'You can unauthorize at any time by doing "gh my unauth"'
@@ -327,7 +349,7 @@ chrome.extension.onRequest.addListener (message, sender, sendResponse) ->
 chrome.omnibox.onInputChanged.addListener omni.suggest.bind omni
 
 # This event is fired when !!the user starts the omnibox
-chrome.omnibox.onInputStarted.addListener ->
+chrome.omnibox.onInputStarted.addListener omni.setup.bind omni
 
 # This event is fired with the user accepts the input in the omnibox.
 chrome.omnibox.onInputEntered.addListener omni.decide.bind omni
