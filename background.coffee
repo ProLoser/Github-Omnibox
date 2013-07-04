@@ -2,6 +2,7 @@ class Omni
     debug: false
     urls:
         github: 'https://github.com/'
+        gist: 'https://gist.github.com/'
         api: 'https://api.github.com/'
         travis: 'https://travis-ci.org/'
         clone: 'github-mac://openRepo/https://github.com/'
@@ -21,6 +22,8 @@ class Omni
         my:
             repos: []
             orgs: []
+            following: []
+            gists: []
         their:
             repos: {}
             user: null
@@ -61,6 +64,7 @@ class Omni
             { content: '/', description: '<dim>search for my</dim> <match>/</match><url>repo</url>' }
             { content: '!', description: '<dim>this repo</dim> <match>!</match><url>action</url>' }
             { content: 'my ', description: '<dim>my account</dim> <match>my</match> <url>action</url>' }
+            { content: 'gist ', description: '<dim>gists</dim> <match>gist</match> <url>id</url>' }
             { content: '@', description: '<dim>user actions</dim> <match>@</match><url>user</url>' }
         ]
 
@@ -78,10 +82,16 @@ class Omni
             @powerPush suggestions, "my new ", ['repo'], '<dim>my</dim> new '
                 
             switch true
-                when @text[0] is '@', !!@text.match /[\w-]+\/ /
-                    ### @user ###
+                when !!@text.match /gist ?/
+                    ### 'gist ' ###
+                    Array::unshift.apply suggestions, @suggestionsFromGists @caches.my.gists
+                when !!@text.match /@[\w-]+ /, !!@text.match /[\w-]+\/ /
+                    ### '@user ' ###
                     ### 'user/ ' ###
                     @powerPush suggestions, "#{split[0]} ", @actions.user, "<dim>user</dim> #{split[0]} "
+                when @text[0] is '@'
+                    ### @user ###
+                    @powerPush suggestions, "@", _.pluck(@caches.my.following, 'login'), "<dim>user</dim> @"
                 when !!@text.match /^\w+\/[\w-\.]+ /
                     ### 'user/repo ' ###
                     @powerPush suggestions, "#{split[0]} new ", @actions.new
@@ -89,18 +99,20 @@ class Omni
                 when !!@text.match /^\w+\//
                     ### user/ ###
                     @getTheirRepos split[0].split('/')[0], (repos) =>
-                        @suggester @filter @text, @suggestionsFromRepos repos
+                        @suggester @filter @text, @powerPush([], null, _.pluck(repos, 'full_name'), '<dim>repo</dim> '), true
+                    return
                 when !!@text.match /^\/[\w-\.]*/
                     ### /repo ###
-                    Array::unshift.apply suggestions, @suggestionsFromRepos @caches.my.repos
-                    @suggester @filter @text, suggestions, true
+                    @suggester @filter @text, @powerPush([], null, _.pluck(@caches.my.repos, 'full_name'), '<dim>repo</dim> '), true
                     return
             @suggester @filter @text, suggestions
+
 
     powerPush: (destination, prefix = '', source, descriptionPrefix = prefix) ->
         Array::unshift.apply destination, _.map source, (item) =>
             description: descriptionPrefix + item
             content: prefix + item
+        destination
 
     getCurrentRepo: (callback) ->
         chrome.tabs.getSelected null, (tab) =>
@@ -112,9 +124,21 @@ class Omni
                 repo = match[2]
             callback user, repo 
 
+    suggestionsFromGists: (gists) ->
+        suggestions = []
+        _.each gists, (gist) =>
+            suggestions.push
+                content: "gist #{gist.user.login}/#{gist.id}"
+                description: "gist <url>#{gist.user.login}/#{gist.id}</url>: <dim>#{gist.description?.split('&').join('&amp;')}</dim>"
+        suggestions
+
     decide: (@text) ->
         split = @text.split(' ')
         switch true
+            when split[0] is 'gist' and !!(match = split[1].match /^([\w-]+\/)?([0-9]+)$/)
+                ### gist x ###
+                url = "#{@urls.gist}#{match[1]}#{match[2]}"
+                fullPath = true
             when !!@text.match /^my/
                 ### my ###
                 switch true
@@ -252,10 +276,7 @@ class Omni
             # Ready for action, can now make requests with token
             @api = github
 
-            @query 'user', (err, data) =>
-                @user = data.login
-
-            @getMyRepos()
+            @reset()
 
     unauthorize: ->
         if @api
@@ -305,21 +326,29 @@ class Omni
                 @caches.their.repos[user] = repos
                 myback()
 
-    suggestionsFromRepos: (repos) ->
-        suggestions = []
-        _(repos).each (repo) =>
-            suggestions.push
-                description: "<dim>repo</dim> #{repo.full_name}"
-                content: repo.full_name
-        suggestions
-
     reset: ->
         @caches.my =
             repos: []
             orgs: []
+            following: []
+            gists: []
         @cancel()
+
+        @query 'gists', (err, data) =>
+            Array::push.apply @caches.my.gists, data
+        @query 'gists/starred', (err, data) =>
+            Array::push.apply @caches.my.gists, data
+
+        @query 'user/following', (err, data) =>
+            @caches.my.following = data
+
+        @getMyRepos()
+
         if @api
             @getMyRepos()
+            @query 'user', (err, data) =>
+                @user = data.login
+
 
     cancel: ->
         @caches.their =
