@@ -7,7 +7,7 @@
                 suggest: function (args) {
                     var content;
                     if (args[0][0] === "!") {
-                        content = "!" + aStep.label;
+                        content = aStep.label;
                     } else {
                         content = args[0] + " " + aStep.label;
                     }
@@ -18,7 +18,11 @@
                 },
                 decide: function (args) {
                     return getFullRepo(args).done(function (fullRepo) {
-                        return fullRepo + "/" + (value.action || aStep.label);
+                        var label = aStep.label;
+                        if (aStep.label[0] === "!") {
+                            label = aStep.label.substring(1);
+                        }
+                        return fullRepo + "/" + (value.action || label);
                     });
                 }
             }, value);
@@ -61,7 +65,7 @@
 
     var repoActions = {
         io: {
-            pattern: /^(io|pages)$/,
+            pattern: /^io|^pages)$/,
             suggest: function (args) {
                 return {
                     content: args[0] + " io",
@@ -246,24 +250,26 @@
     StepManager.loadPatterns({
         registerShorthands: shorthands,
         "user/repo": {
-            pattern: /^\w+\/[\-\w\.]+/,
-            children: repoActions,
+            pattern: /^\w+\/[\-\w\.]*/,
             suggest: function (args) {
                 return []; // TODO suggest user's repos
             },
             decide: function (args) {
                 return args[0];
-            }
+            },
+
+            children: repoActions
         },
         "/repo": {
             pattern: /^\/[\-\w\.]*/,
-            children: repoActions,
             suggest: function (args) {
                 return []; // TODO suggest my repos
             },
             decide: function (args) {
                 return gh.user.name + args[0];
-            }
+            },
+
+            children: repoActions
         }
     });
 

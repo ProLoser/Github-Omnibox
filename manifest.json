@@ -1,11 +1,20 @@
 {
   "name": "Github Omnibox",
   "description" : "Github-powered omnibox for chrome!",
-  "version": "0.4.12",
+  "version": "0.0.0",
   "background": {
     "scripts": [
-      "underscore-min.js",
+      "lib/underscore-min.js",
       "oauth2/oauth2.js",
+
+      "src/Defer.js",
+      "src/Steps.js",
+      "src/StepsManager.js",
+      "src/patterns/my.js",
+      "src/patterns/new.js",
+      "src/patterns/repoActions.js",
+      "src/patterns/userActions.js",
+
       "background.js"
     ]
   },
@@ -16,7 +25,7 @@
       "run_at": "document_start"
     }
   ],
-  "omnibox": { "keyword" : "gh" },
+  "omnibox": { "keyword" : "hg" },
   "icons": {
   	"16": "images/favicon-16.png",
   	"32": "images/favicon-32.png",

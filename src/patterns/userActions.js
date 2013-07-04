@@ -11,7 +11,7 @@ StepManager.loadPatterns({
                 decide: function (args) {
                     var user;
                     if (args[0][0] == "@") {
-                        user = args[0][0].substring(1) + "/";
+                        user = args[0].substring(1) + "/";
                     } else {
                         user = args[0];
                     }
