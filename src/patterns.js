@@ -76,7 +76,6 @@ var Step = (function () {
                     suggestions = suggestions.concat(this.getChildSuggest(args, text));
                     if (this.value.suggest) {
                         suggestions = suggestions.concat(this.value.suggest.call(this, args, text));
-                        console.log(this.label, this.pattern, args[this.level], this.pattern.test(args[this.level]));
                     }
                 }
             }
@@ -237,10 +236,10 @@ Defer.eachDone = function (value, eachDone) {
 
 //Testing if it works (I'm using node)
 
-var text = "@rodyhaddad foll";
+var text = "/dsa #4";
 
 console.log("Suggesting or deciding for:", text);
 
-Defer.eachDone(StepManager.suggest(text), function (value, index) {
+Defer.eachDone(StepManager.decide(text), function (value, index) {
     console.log(index, value);
 });

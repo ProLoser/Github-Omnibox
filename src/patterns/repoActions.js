@@ -23,7 +23,7 @@
                 }
             }, value);
         },
-        easyAlias: function (value, aStep) {
+        easyAlias: function (value) {
             return {
                 suggest: function (args, text) {
                     var alias = _.isFunction(value.alias) ? value.alias(args, text) : value.alias.split(" ");
@@ -103,7 +103,7 @@
         graphs: {
             shorthand: "repoActions"
         },
-        "#issue": { // TODO !#issue, user/repo #issue
+        "#issue": {
             pattern: /#[0-9]+/,
             suggest: function (args) {
                 var prefix, issue, content;
@@ -121,10 +121,6 @@
                         description: prefix + args[0] + " #" + issue
                     };
                 }
-                return {
-                    content: content,
-                    description: prefix + content
-                };
             },
             decide: function (args) {
                 return getFullRepo(args).done(function (fullRepo) {
@@ -167,7 +163,7 @@
                 }
             }
         },
-        clone: { // TODO
+        clone: {
             shorthand: "repoActions",
             decide: function (args) {
                 return getFullRepo(args).done(function (fullRepo) {
@@ -184,7 +180,7 @@
             }
         },
         "@branch": {
-            pattern: /^@\w+/,
+            pattern: /^@\w+/, // This pattern is changed for "!@branch"
             suggest: function (args, text) {
                 return {
                     content: text,
@@ -226,7 +222,7 @@
             }
         },
         "/path": {
-            pattern: /^\/\w+/,
+            pattern: /^\/\w+/, // This pattern is changed for "!/path"
             suggest: function (args, text) {
                 return {
                     content: text,
@@ -253,7 +249,7 @@
             pattern: /^\w+\/[\-\w\.]+/,
             children: repoActions,
             suggest: function (args) {
-                return [];
+                return []; // TODO suggest user's repos
             },
             decide: function (args) {
                 return args[0];
@@ -263,7 +259,7 @@
             pattern: /^\/[\-\w\.]*/,
             children: repoActions,
             suggest: function (args) {
-                return [];
+                return []; // TODO suggest my repos
             },
             decide: function (args) {
                 return gh.user.name + args[0];
@@ -277,6 +273,8 @@
             prefix: "this repo's"
         }, value);
     });
+    thisRepoActions["!@branch"].pattern = /^!@\w+/;
+    thisRepoActions["!/path"].pattern = /^!\/\w+/;
     StepManager.loadPatterns(thisRepoActions);
 
 }());

@@ -1,8 +1,6 @@
 StepManager.loadPatterns({
     registerShorthands: {
         userActions: function (value, aStep) {
-            var road = aStep.getRoad();
-
             return _.extend({
                 suggest: function (args) {
                     return {
@@ -23,7 +21,8 @@ StepManager.loadPatterns({
         }
     },
     "@user/": {
-        pattern: /^\w+\/|@\w+/, //also accepts user/
+        // TODO not sure this regex is good
+        pattern: /^\w+\/|^@\w+/, // accepts @user and user/
         shorthand: "userActions",
         url: "",
 
