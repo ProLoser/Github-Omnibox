@@ -1,331 +1,4 @@
-// Stil prototyping
-
-//This is not 100% end structure
-var patterns = {
-    my: {
-        children: {
-            issues: {
-                shorthand: "straightFwd", // look in "Step" class definition
-                url: "dashboard/issues"
-            },
-            dash: {
-                shorthand: "straightFwd",
-                url: ""
-            },
-            pulls: {
-                shorthand: "straightFwd",
-                url: "dashboard/pulls"
-            },
-            stars: {
-                shorthand: "straightFwd",
-                url: "stars"
-            },
-            settings: {
-                shorthand: "straightFwd",
-                url: "dashboard/settings"
-            },
-            followers: {
-                shorthand: "straightFwd",
-                url: "<%= gh.user.name %>/followers"
-            },
-            following: {
-                shorthand: "straightFwd",
-                url: "<%= gh.user.name %>/following"
-            },
-            starred: {
-                shorthand: "straightFwd",
-                url: "stars"
-            },
-            repositories: {
-                shorthand: "straightFwd",
-                url: "<%= gh.user.name %>/?tab=repositories"
-            },
-            activities: {
-                shorthand: "straightFwd",
-                url: "<%= gh.user.name %>/?tab=activity"
-            },
-            testing: {
-                suggest: function () {
-                    var defer = Defer();
-                    setTimeout(function () {
-                        defer.resolve({content: 2, description: 2})
-                    }, 2000);
-                    return [
-                        {content: 1, description: 1},
-                        defer,
-                        {content: 3, description: 3}
-                    ];
-                },
-                decide: function () {
-                    var defer = Defer();
-                    setTimeout(function () {
-                        defer.resolve("WORKS")
-                    }, 2000);
-                    return defer;
-                }
-            }
-        }
-    },
-
-    '!': {
-        pattern: /!\w+/,
-        //TODO description prefix 'this repo'
-        children: {
-            io: {
-                pattern: /^(io|pages)$/,
-                suggest: function (args) {
-                    return {
-                        content: "!io",
-                        description: "this repo's io"
-                    }
-                },
-                decide: function (args) {
-
-                }
-            },
-            pulls: {
-                shorthand: "straightFwd",
-                url: "<%= user.name %>/<$= repo.name %>/pulls"
-            },
-            network: {
-                shorthand: "straightFwd",
-                url: "<%= user.name %>/<$= repo.name %>/network"
-            },
-            pulse: {
-                shorthand: "straightFwd",
-                url: "<%= user.name %>/<$= repo.name %>/pulse"
-            },
-            settings: {
-                shorthand: "straightFwd",
-                url: "<%= user.name %>/<$= repo.name %>/settings"
-            },
-            issues: {
-                shorthand: "straightFwd",
-                url: "<%= user.name %>/<$= repo.name %>/issues"
-            },
-            contributors: {
-                shorthand: "straightFwd",
-                url: "<%= user.name %>/<$= repo.name %>/contributors"
-            },
-            compare: {
-                shorthand: "straightFwd",
-                url: "<%= user.name %>/<$= repo.name %>/compare"
-            },
-            wiki: {
-                shorthand: "straightFwd",
-                url: "<%= user.name %>/<$= repo.name %>/wiki"
-            },
-            graphs: {
-                shorthand: "straightFwd",
-                url: "<%= user.name %>/<$= repo.name %>/graphs"
-            },
-            '#': { // TODO
-                suggest: function (args) {
-
-                },
-                decide: function (args) {
-
-                }
-            }
-        }
-    },
-
-    'new': {
-        children: { // TODO
-            issue: {
-                suggest: function (args) {
-
-                },
-                decide: function (args) {
-
-                }
-            },
-            repo: {
-                suggest: function (args) {
-
-                },
-                decide: function (args) {
-
-                }
-            }
-        }
-    },
-
-    '@user': {
-        pattern: /^@\w+/,
-        suggest: function (args) {
-
-        },
-        decide: function (args) {
-
-        },
-        children: {
-            followers: {
-                suggest: function (args) {
-
-                },
-                decide: function (args) {
-
-                }
-            },
-            following: {
-                suggest: function (args) {
-
-                },
-                decide: function (args) {
-
-                }
-            },
-            starred: {
-                suggest: function (args) {
-
-                },
-                decide: function (args) {
-
-                }
-            },
-            repositories: {
-                suggest: function (args) {
-
-                },
-                decide: function (args) {
-
-                }
-            },
-            activities: {
-                suggest: function (args) {
-
-                },
-                decide: function (args) {
-
-                }
-            }
-        }
-    },
-
-    'user/repo': {
-        pattern: /^\w+\/[\-\w\.]+/, //TODO space at the end
-        suggest: function (args) {
-
-        },
-        decide: function (args) {
-
-        },
-
-        children: {
-            'new': {
-                children: {
-                    issue: {
-                        suggest: function (args) {
-
-                        },
-                        decide: function (args) {
-
-                        }
-                    },
-                    pull: {
-                        suggest: function (args) {
-
-                        },
-                        decide: function (args) {
-
-                        }
-                    }
-                }
-            },
-            issues: {
-                suggest: function (args) {
-
-                },
-                decide: function (args) {
-
-                }
-            },
-            io: {
-                pattern: /^(io|pages)$/,
-                suggest: function (args) {
-
-                },
-                decide: function (args) {
-
-                }
-            },
-            clone: {
-                suggest: function (args) {
-
-                },
-                decide: function (args) {
-
-                }
-            },
-            travis: {
-                pattern: /^(travis|travis-ci|ci)$/,
-                suggest: function (args) {
-
-                },
-                decide: function (args) {
-
-                }
-            },
-            actions: {
-                pattern: /^(network|contributors|pulls|pulse|issues|settings|graphs|compare|wiki)$/,
-                suggest: function (args) {
-
-                },
-                decide: function (args) {
-
-                }
-            },
-            '#': {
-                pattern: /^#[0-9]+/,
-                suggest: function (args) {
-
-                },
-                decide: function (args) {
-
-                }
-            },
-            branch: {
-                pattern: /^@/,
-                suggest: function (args) {
-
-                },
-                decide: function (args) {
-
-                }
-            },
-            path: {
-                pattern: /^\/.*/,
-                suggest: function (args) {
-
-                },
-                decide: function (args) {
-
-                }
-            }
-        }
-    },
-
-    'user/': {
-        pattern: /^\w+\//,
-        suggest: function (args) {
-
-        },
-        decide: function (args) {
-
-        }
-    },
-
-    '/repo': {
-        pattern: /^\/[\-\w\.]*/,
-        suggest: function (args) {
-
-        },
-        decide: function (args) {
-
-        }
-    }
-};
+global._ = require("../lib/underscore-min.js");
 
 /**
  * What a "Step" is:
@@ -345,38 +18,15 @@ var patterns = {
  */
 var Step = (function () {
 
-    //to not be repetitive
-    var StepValueShorthand = {
-        straightFwd: function (value, aStep) {
-            //getting the "road" to get to this step
-            //so here we're constructing the string "my issues"
-            var steps = [];
-            do {
-                steps.unshift(aStep.label);
-            } while (aStep = aStep.parent);
-            steps = steps.join(" ");
-
-            return {
-                suggest: function () {
-                    return {
-                        content: steps,
-                        description: steps
-                    };
-                },
-                decide: function () {
-                    return value.url;
-                }
-            }
-        }
-    };
+    //for values
+    Step.shorthands = {};
 
     function Step(label, value, level, parent) {
         this.label = label;
         this.level = level;
         this.parent = parent || null;
-
-        if (value.shorthand && StepValueShorthand[value.shorthand]) {
-            this.value = StepValueShorthand[value.shorthand](value, this);
+        if (value.shorthand && Step.shorthands[value.shorthand]) {
+            this.value = Step.shorthands[value.shorthand](value, this);
         } else {
             this.value = value;
         }
@@ -389,8 +39,7 @@ var Step = (function () {
         if (value.startsWith) {
             this.startsWith = value.startsWith;
         }
-
-        forEach(value.children, function (childVal, childKey) {
+        _.forEach(value.children, function (childVal, childKey) {
             this.children.push(new Step(childKey, childVal, this.level + 1, this));
         }, this);
     }
@@ -398,16 +47,16 @@ var Step = (function () {
     Step.prototype = {
         // does this Step match those args?
         // only called when parent matches too
-        match: function (args/*, text*/) {
-            if (isRegExp(this.pattern)) {
+        match: function (args, text) {
+            if (_.isRegExp(this.pattern)) {
                 return this.pattern.test(args[this.level]);
             } else {
                 return this.pattern === args[this.level];
             }
         },
         // only called when parent matches too
-        startsWith: function (args/*, text*/) {
-            if (isRegExp(this.pattern)) {
+        startsWith: function (args, text) {
+            if (_.isRegExp(this.pattern)) {
                 return this.pattern.test(args[this.level]);
             } else {
                 return this.pattern.indexOf(args[this.level]) === 0;
@@ -418,16 +67,16 @@ var Step = (function () {
         suggest: function (args, text) {
             var suggestions = [];
             if (this.level === args.size0) {
-                if (this.startsWith(args) && this.value.suggest) {
-                    suggestions = suggestions.concat(this.value.suggest(args, text));
+                if (this.startsWith(args, text) && this.value.suggest) {
+                    suggestions = suggestions.concat(this.value.suggest.call(this, args, text));
                 }
                 suggestions = suggestions.concat(this.getChildSuggest(args, text));
-
             } else if (this.level < args.size0) {
-                if (this.match(args)) {
+                if (this.match(args, text)) {
                     suggestions = suggestions.concat(this.getChildSuggest(args, text));
                     if (this.value.suggest) {
-                        suggestions = suggestions.concat(this.value.suggest(args, text));
+                        suggestions = suggestions.concat(this.value.suggest.call(this, args, text));
+                        console.log(this.label, this.pattern, args[this.level], this.pattern.test(args[this.level]));
                     }
                 }
             }
@@ -436,7 +85,7 @@ var Step = (function () {
         //gives the suggestions of children
         getChildSuggest: function (args, text) {
             var suggestions = [];
-            forEach(this.children, function (childStep) {
+            _.forEach(this.children, function (childStep) {
                 suggestions = suggestions.concat(childStep.suggest(args, text));
             });
             return suggestions;
@@ -445,13 +94,13 @@ var Step = (function () {
         //gives the decision of self, or children if there are other args
         decide: function (args, text) {
             var childDecision;
-            if (this.match(args)) {
+            if (this.match(args, text)) {
                 if (this.level === args.size0) {
                     if (this.value.decide) {
-                        return this.value.decide(args, text);
+                        return this.value.decide.call(this, args, text);
                     }
-                } else if (this.level < args.size0) {
 
+                } else if (this.level < args.size0) {
                     for (var i = 0; i < this.children.length; i++) {
                         childDecision = this.children[i].decide(args, text);
                         if (childDecision) {
@@ -461,6 +110,18 @@ var Step = (function () {
                 }
             }
             return null;
+        },
+
+        //getting the "road" to get to this step (example: "my issues")
+        getRoad: function () {
+            if (this.road) return this.road;
+
+            var steps = [], aStep = this;
+            do {
+                steps.unshift(aStep.label);
+            } while (aStep = aStep.parent);
+
+            return this.road = steps.join(" ");
         }
     };
 
@@ -469,23 +130,37 @@ var Step = (function () {
 }());
 
 
-var StepManager = (function () {
+var StepManager = global.StepManager = (function () {
     var steps = [];
 
     return {
         loadPatterns: function (patterns) {
-            forEach(patterns, function (value, key) {
+            if (patterns.registerShorthands) {
+                _.extend(Step.shorthands, patterns.registerShorthands);
+                delete patterns.registerShorthands;
+            }
+            if (patterns.shorthand && Step.shorthands[patterns.shorthand]) {
+                patterns = Step.shorthands[patterns.shorthand](patterns, null);
+            }
+
+            _.forEach(patterns, function (value, key) {
                 steps.push(new Step(key, value, 0));
             });
         },
-        suggest: function (args, text) {
+        suggest: function (text) {
+            var args = text.split(" ");
+            args.size0 = args.length - 1;
+
             var suggestions = [];
-            forEach(steps, function (aStep) {
+            _.forEach(steps, function (aStep) {
                 suggestions = suggestions.concat(aStep.suggest(args, text));
             });
             return suggestions;
         },
-        decide: function (args, text) {
+        decide: function (text) {
+            var args = text.split(" ");
+            args.size0 = args.length - 1;
+
             var decision;
             for (var i = 0; i < steps.length; i++) {
                 decision = steps[i].decide(args, text);
@@ -498,39 +173,11 @@ var StepManager = (function () {
     }
 
 }());
-StepManager.loadPatterns(patterns);
 
-// I wasn't using underscore, will switch later if needed
-function isArray(arr) {
-    return Object.prototype.toString.call(arr) === "[object Array]";
-}
-
-function isObject(obj) {
-    return Object.prototype.toString.call(obj) === "[object Object]";
-}
-
-function isRegExp(regexp) {
-    return Object.prototype.toString.call(regexp) === "[object RegExp]";
-}
-
-function forEach(obj, iterator, context) {
-    var key, len;
-    if (obj) {
-        if (isArray(obj) || obj.hasOwnProperty("length")) {
-            for (key = 0, len = obj.length; key < len; key++) {
-                iterator.call(context, obj[key], key);
-            }
-        } else {
-            for (key in obj) {
-                if (obj.hasOwnProperty(key)) {
-                    iterator.call(context, obj[key], key);
-                }
-            }
-        }
-    }
-    return obj;
-}
-
+require("./patterns/my.js");
+require("./patterns/repoActions.js");
+require("./patterns/new.js");
+require("./patterns/userActions.js");
 
 function Defer() {
     if (!(this instanceof Defer)) {
@@ -540,10 +187,37 @@ function Defer() {
     this.resolveValue = null;
     this.cb = null;
 }
-
+global.Defer = Defer;
+Defer.prototype = {
+    resolve: function (value) {
+        this.resolveValue = value;
+        if (this.cb) {
+            _.forEach(this.cb, function (cb) {
+                this.resolveValue = cb(this.resolveValue) || this.resolveValue;
+            }, this);
+        }
+        this.resolved = true;
+        return this;
+    },
+    done: function (cb) {
+        if (this.resolved) {
+            var self = this;
+            setTimeout(function () {
+                self.resolveValue = cb(self.resolveValue) || self.resolveValue;
+            }, 0)
+        } else {
+            if (!this.cb) {
+                this.cb = [cb];
+            } else {
+                this.cb.push(cb);
+            }
+        }
+        return this;
+    }
+};
 Defer.eachDone = function (value, eachDone) {
-    if (isArray(value)) {
-        forEach(value, function (value, index) {
+    if (_.isArray(value)) {
+        _.forEach(value, function (value, index) {
             if (value instanceof Defer) {
                 value.done(function (value) {
                     eachDone(value, index);
@@ -561,41 +235,12 @@ Defer.eachDone = function (value, eachDone) {
     }
 };
 
-Defer.prototype = {
-    resolve: function (value) {
-        this.resolveValue = value;
-        if (this.cb) {
-            forEach(this.cb, function (cb) {
-                cb(value);
-            });
-        }
-    },
-    done: function (cb) {
-        if (this.resolved) {
-            var resolveValue = this.resolveValue;
-            setTimeout(function () {
-                cb(resolveValue);
-            }, 0)
-        } else {
-            if (!this.cb) {
-                this.cb = [cb];
-            } else {
-                this.cb.push(cb);
-            }
-        }
-    }
-};
-
-
 //Testing if it works (I'm using node)
 
-var text = "my t";
-var args = text.split(' ');
-//size0 is the length, starting from 0 instead of 1
-args.size0 = args.length - 1;
+var text = "@rodyhaddad foll";
 
 console.log("Suggesting or deciding for:", text);
 
-Defer.eachDone(StepManager.suggest(args, text), function (value, index) {
+Defer.eachDone(StepManager.suggest(text), function (value, index) {
     console.log(index, value);
 });
