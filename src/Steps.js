@@ -100,13 +100,13 @@ var Step = (function () {
                 } else if (this.level < args.size0) {
                     for (var i = 0; i < this.children.length; i++) {
                         childDecision = this.children[i].decide(args, text);
-                        if (childDecision !== null) {
+                        if (!_.isUndefined(childDecision)) {
                             return childDecision;
                         }
                     }
                 }
             }
-            return null;
+            return undefined;
         },
 
         //getting the "road" to get to this step (example: "my issues")

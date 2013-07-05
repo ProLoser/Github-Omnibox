@@ -72,6 +72,31 @@ StepManager.loadPatterns({
             activities: {
                 shorthand: "myStraightFwd",
                 url: "?tab=activity"
+            },
+
+            auth: {
+                shorthand: "myStraightFwd",
+                decide: function () {
+                    omni.authorize();
+                    alert("You can unauthorize at any time by doing \"gh my unauth\"");
+                    return false;
+                }
+            },
+            unauth: {
+                shorthand: "myStraightFwd",
+                decide: function () {
+                    omni.unauthorize();
+                    alert('You can authorize at any time by doing "gh my auth"');
+                    return false;
+                }
+            },
+            reset: {
+                shorthand: "myStraightDwf",
+                decide: function () {
+                    omni.reset();
+                    alert('Cache has been reset'); // TODO reset or clear?
+                    return false;
+                }
             }
         }
     }

@@ -33,7 +33,7 @@ var StepManager = (function () {
             var decision;
             for (var i = 0; i < steps.length; i++) {
                 decision = steps[i].decide(args, text);
-                if (decision !== null) {
+                if (!_.isUndefined(decision)) {
                     return decision;
                 }
             }
