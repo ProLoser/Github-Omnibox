@@ -30,11 +30,11 @@
         easyAlias: function (value) {
             return {
                 suggest: function (args, text) {
-                    var alias = _.isFunction(value.alias) ? value.alias(args, text) : value.alias.split(" ");
+                    var alias = _.isFunction(value.alias) ? value.alias(args, text) : value.alias;
                     return StepManager.suggest(alias);
                 },
                 decide: function (args, text) {
-                    var alias = _.isFunction(value.alias) ? value.alias(args, text) : value.alias.split(" ");
+                    var alias = _.isFunction(value.alias) ? value.alias(args, text) : value.alias;
                     return StepManager.decide(alias);
                 }
             }

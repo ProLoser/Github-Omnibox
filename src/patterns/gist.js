@@ -48,12 +48,12 @@
                     decide: decideGist
                 },
                 "user/": {
-                    pattern: /^[\w-]+\/$/,
+                    pattern: /^[\w-]+\/?$/,
                     suggest: function (args) {
                         return [
                             {
-                                content: args.join(" "),
-                                description: args.join(" ")
+                                content: args.join(" ") + "/",
+                                description: args.join(" ") + "/"
                             }
                         ].concat(suggestGist(args[1].replace("/", ""), null));
                     },
