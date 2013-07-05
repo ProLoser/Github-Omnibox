@@ -10,6 +10,8 @@
             "src/Defer.js",
             "src/Steps.js",
             "src/StepsManager.js",
+
+            "src/patterns/help.js",
             "src/patterns/my.js",
             "src/patterns/new.js",
             "src/patterns/repoActions.js",
