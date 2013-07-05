@@ -14,6 +14,21 @@ StepManager.loadPatterns({
                     return value.url;
                 }
             }, value);
+        },
+        myStraightFwd: function (value, aStep) {
+            var road = aStep.getRoad();
+
+            return _.extend({
+                suggest: function () {
+                    return {
+                        content: road,
+                        description: road
+                    };
+                },
+                decide: function () {
+                    return omni.user + "/" + value.url;
+                }
+            }, value);
         }
     },
     my: {
@@ -34,49 +49,29 @@ StepManager.loadPatterns({
                 shorthand: "straightFwd",
                 url: "stars"
             },
+            starred: {
+                shorthand: "straightFwd",
+                url: "stars"
+            },
             settings: {
                 shorthand: "straightFwd",
                 url: "dashboard/settings"
             },
             followers: {
-                shorthand: "straightFwd",
-                url: "<%= gh.user.name %>/followers"
+                shorthand: "myStraightFwd",
+                url: "followers"
             },
             following: {
-                shorthand: "straightFwd",
-                url: "<%= gh.user.name %>/following"
-            },
-            starred: {
-                shorthand: "straightFwd",
-                url: "stars"
+                shorthand: "myStraightFwd",
+                url: "following"
             },
             repositories: {
-                shorthand: "straightFwd",
-                url: "<%= gh.user.name %>/?tab=repositories"
+                shorthand: "myStraightFwd",
+                url: "?tab=repositories"
             },
             activities: {
-                shorthand: "straightFwd",
-                url: "<%= gh.user.name %>/?tab=activity"
-            },
-            testing: {
-                suggest: function () {
-                    var defer = Defer();
-                    setTimeout(function () {
-                        defer.resolve({content: 2, description: 2})
-                    }, 2000);
-                    return [
-                        {content: 1, description: 1},
-                        defer,
-                        {content: 3, description: 3}
-                    ];
-                },
-                decide: function () {
-                    var defer = Defer();
-                    setTimeout(function () {
-                        defer.resolve("WORKS")
-                    }, 2000);
-                    return defer;
-                }
+                shorthand: "myStraightFwd",
+                url: "?tab=activity"
             }
         }
     }

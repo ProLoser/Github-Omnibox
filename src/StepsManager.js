@@ -2,6 +2,7 @@ var StepManager = (function () {
     var steps = [];
 
     return {
+        steps: steps,
         loadPatterns: function (patterns) {
             if (patterns.registerShorthands) {
                 _.extend(Step.shorthands, patterns.registerShorthands);
@@ -23,7 +24,6 @@ var StepManager = (function () {
             _.forEach(steps, function (aStep) {
                 suggestions = suggestions.concat(aStep.suggest(args, text));
             });
-            console.log(text, args, suggestions);
             return suggestions;
         },
         decide: function (text) {
@@ -33,12 +33,11 @@ var StepManager = (function () {
             var decision;
             for (var i = 0; i < steps.length; i++) {
                 decision = steps[i].decide(args, text);
-                if (decision) {
+                if (decision !== null) {
                     return decision;
                 }
             }
             return null;
         }
     }
-
 }());

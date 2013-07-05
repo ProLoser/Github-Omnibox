@@ -42,7 +42,14 @@ Defer.eachDone = function (value, eachDone) {
         _.forEach(value, function (value, index) {
             if (value instanceof Defer) {
                 value.done(function (value) {
-                    eachDone(value, index);
+                    if (_.isArray(value)) {
+                        _.each(value, function(value, i, list) {
+                            var addedIndex = (i+1) / (list.length+2);
+                            eachDone(value, index + addedIndex);
+                        });
+                    } else {
+                        eachDone(value, index);
+                    }
                 });
             } else {
                 eachDone(value, index);

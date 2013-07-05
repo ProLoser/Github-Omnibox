@@ -65,7 +65,7 @@
 
     var repoActions = {
         io: {
-            pattern: /^io|^pages)$/,
+            pattern: /^io|^pages$/,
             suggest: function (args) {
                 return {
                     content: args[0] + " io",
@@ -252,7 +252,24 @@
         "user/repo": {
             pattern: /^\w+\/[\-\w\.]*/,
             suggest: function (args) {
-                return []; // TODO suggest user's repos
+                if (args.size0 > this.level) return [];
+
+                var repoName = args[0].split('/')[1];
+                return [{
+                    content: args[0],
+                    description: args[0]
+                }, omni.getTheirRepos(args[0].split('/')[0]).done(function (repos) {
+                    var theirRepos = [];
+                    _.each(repos, function (repo) {
+                        if (repo.name.indexOf(repoName) === 0 && repo.full_name !== args[0]) {
+                            theirRepos.push({
+                                content: repo.full_name,
+                                description: repo.full_name
+                            });
+                        }
+                    });
+                    return theirRepos;
+                })];
             },
             decide: function (args) {
                 return args[0];
@@ -262,11 +279,23 @@
         },
         "/repo": {
             pattern: /^\/[\-\w\.]*/,
-            suggest: function (args) {
-                return []; // TODO suggest my repos
+            suggest: function (args) { // TODO
+                var repoName = args[0].substring(1), myRepos = [{
+                    content: args[0],
+                    description: args[0]
+                }];
+                _.each(omni.caches.my.repos, function (repo) {
+                    if (repo.name.indexOf(repoName) === 0 && repo.name !== repoName) {
+                        myRepos.push({
+                            content: repo.full_name,
+                            description: repo.full_name
+                        });
+                    }
+                });
+                return myRepos;
             },
             decide: function (args) {
-                return gh.user.name + args[0];
+                return omni.user + args[0];
             },
 
             children: repoActions

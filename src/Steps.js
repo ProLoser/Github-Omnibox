@@ -100,7 +100,7 @@ var Step = (function () {
                 } else if (this.level < args.size0) {
                     for (var i = 0; i < this.children.length; i++) {
                         childDecision = this.children[i].decide(args, text);
-                        if (childDecision) {
+                        if (childDecision !== null) {
                             return childDecision;
                         }
                     }
