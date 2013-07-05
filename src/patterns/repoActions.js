@@ -44,8 +44,8 @@
     function getFullRepo(args) {
         var defer = Defer(), firstArg = args[0];
         if (firstArg[0] === "!") { // !
-            chrome.tabs.getSelected(null, function (tab) {
-                var match, repo, user;
+            chrome.tabs.query({active: true, lastFocusedWindow: true}, function (tabs) {
+                var match, repo, user, tab = tabs[0];
                 if (match = tab.url.match(/github\.com\/(([\w-]+)\/([\-\w\.]+))/)) {
                     user = match[2];
                     repo = match[3];
@@ -65,19 +65,21 @@
 
     var repoActions = {
         io: {
-            pattern: /^io|^pages$/,
-            suggest: function (args) {
-                return {
-                    content: args[0] + " io",
-                    description: "this repo's io"
-                }
-            },
+            shorthand: "repoActions",
             decide: function (args) {
                 return getFullRepo(args).done(function (fullRepo) {
                     var repo = fullRepo.split("/");
                     return "http://" + repo[0] + ".github.io/" + repo[1];
-                })
-
+                });
+            }
+        },
+        pages: {
+            shorthand: "repoActions",
+            decide: function (args) {
+                return getFullRepo(args).done(function (fullRepo) {
+                    var repo = fullRepo.split("/");
+                    return "http://" + repo[0] + ".github.io/" + repo[1];
+                });
             }
         },
         pulls: {
@@ -255,21 +257,24 @@
                 if (args.size0 > this.level) return [];
 
                 var repoName = args[0].split('/')[1];
-                return [{
-                    content: args[0],
-                    description: args[0]
-                }, omni.getTheirRepos(args[0].split('/')[0]).done(function (repos) {
-                    var theirRepos = [];
-                    _.each(repos, function (repo) {
-                        if (repo.name.indexOf(repoName) === 0 && repo.full_name !== args[0]) {
-                            theirRepos.push({
-                                content: repo.full_name,
-                                description: repo.full_name
-                            });
-                        }
-                    });
-                    return theirRepos;
-                })];
+                return [
+                    {
+                        content: args[0],
+                        description: args[0]
+                    },
+                    omni.getTheirRepos(args[0].split('/')[0]).done(function (repos) {
+                        var theirRepos = [];
+                        _.each(repos, function (repo) {
+                            if (repo.name.indexOf(repoName) === 0 && repo.full_name !== args[0]) {
+                                theirRepos.push({
+                                    content: repo.full_name,
+                                    description: repo.full_name
+                                });
+                            }
+                        });
+                        return theirRepos;
+                    })
+                ];
             },
             decide: function (args) {
                 return args[0];
@@ -280,10 +285,12 @@
         "/repo": {
             pattern: /^\/[\-\w\.]*/,
             suggest: function (args) { // TODO
-                var repoName = args[0].substring(1), myRepos = [{
-                    content: args[0],
-                    description: args[0]
-                }];
+                var repoName = args[0].substring(1), myRepos = [
+                    {
+                        content: args[0],
+                        description: args[0]
+                    }
+                ];
                 _.each(omni.caches.my.repos, function (repo) {
                     if (repo.name.indexOf(repoName) === 0 && repo.name !== repoName) {
                         myRepos.push({
@@ -310,6 +317,7 @@
     });
     thisRepoActions["!@branch"].pattern = /^!@\w+/;
     thisRepoActions["!/path"].pattern = /^!\/\w+/;
+
     StepManager.loadPatterns(thisRepoActions);
 
 }());

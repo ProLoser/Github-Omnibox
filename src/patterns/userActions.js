@@ -8,6 +8,7 @@
         }
         return user;
     }
+
     StepManager.loadPatterns({
         registerShorthands: {
             userActions: function (value, aStep) {
@@ -31,10 +32,12 @@
             url: "",
             suggest: function (args) {
                 var user = getUser(args);
-                var suggestions = [{
-                    content: "@" + user,
-                    description: "@" + user
-                }];
+                var suggestions = [
+                    {
+                        content: "@" + user,
+                        description: "@" + user
+                    }
+                ];
                 _.each(omni.caches.my.following, function (followedUser) {
                     if (!user || (followedUser.login.indexOf(user) === 0 && followedUser.login !== user)) {
                         suggestions.push({
