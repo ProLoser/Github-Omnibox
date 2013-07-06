@@ -1,45 +1,26 @@
 (function () {
-    var shorthands = {
-        repoActions: function (value, aStep) {
-            var prefix = value.prefix ? value.prefix + " " : "";
-
-            return _.extend({
-                suggest: function (args) {
-                    var content;
-                    if (args[0][0] === "!") {
-                        content = aStep.label;
-                    } else {
-                        content = args[0] + " " + aStep.label;
-                    }
-                    return {
-                        content: content,
-                        description: prefix + content
-                    };
-                },
-                decide: function (args) {
-                    return getFullRepo(args).done(function (fullRepo) {
-                        var label = aStep.label;
-                        if (aStep.label[0] === "!") {
-                            label = aStep.label.substring(1);
-                        }
-                        return fullRepo + "/" + (value.action || label);
-                    });
-                }
-            }, value);
-        },
-        easyAlias: function (value) {
-            return {
-                suggest: function (args, text) {
-                    var alias = _.isFunction(value.alias) ? value.alias(args, text) : value.alias;
-                    return StepManager.suggest(alias);
-                },
-                decide: function (args, text) {
-                    var alias = _.isFunction(value.alias) ? value.alias(args, text) : value.alias;
-                    return StepManager.decide(alias);
-                }
-            }
+    function suggestOwnLabel(args) {
+        var content;
+        if (args[0][0] === "!") {
+            content = this.label;
+        } else {
+            content = args[0] + " " + this.label;
         }
-    };
+        return {
+            content: content,
+            description: (this.value.prefix || "") + content
+        };
+    }
+
+    function decideFromLabel(args) {
+        var label = this.label;
+        if (label[0] === "!") {
+            label = label.substring(1);
+        }
+        return getFullRepo(args).done(function (fullRepo) {
+            return fullRepo + "/" + label;
+        });
+    }
 
     function getFullRepo(args) {
         var defer = Defer(), firstArg = args[0];
@@ -65,7 +46,7 @@
 
     var repoActions = {
         io: {
-            shorthand: "repoActions",
+            suggest: suggestOwnLabel,
             decide: function (args) {
                 return getFullRepo(args).done(function (fullRepo) {
                     var repo = fullRepo.split("/");
@@ -74,7 +55,7 @@
             }
         },
         pages: {
-            shorthand: "repoActions",
+            suggest: suggestOwnLabel,
             decide: function (args) {
                 return getFullRepo(args).done(function (fullRepo) {
                     var repo = fullRepo.split("/");
@@ -83,36 +64,45 @@
             }
         },
         pulls: {
-            shorthand: "repoActions"
+            suggest: suggestOwnLabel,
+            decide: decideFromLabel
         },
         network: {
-            shorthand: "repoActions"
+            suggest: suggestOwnLabel,
+            decide: decideFromLabel
         },
         pulse: {
-            shorthand: "repoActions"
+            suggest: suggestOwnLabel,
+            decide: decideFromLabel
         },
         settings: {
-            shorthand: "repoActions"
+            suggest: suggestOwnLabel,
+            decide: decideFromLabel
         },
         issues: {
-            shorthand: "repoActions"
+            suggest: suggestOwnLabel,
+            decide: decideFromLabel
         },
         contributors: {
-            shorthand: "repoActions"
+            suggest: suggestOwnLabel,
+            decide: decideFromLabel
         },
         compare: {
-            shorthand: "repoActions"
+            suggest: suggestOwnLabel,
+            decide: decideFromLabel
         },
         wiki: {
-            shorthand: "repoActions"
+            suggest: suggestOwnLabel,
+            decide: decideFromLabel
         },
         graphs: {
-            shorthand: "repoActions"
+            suggest: suggestOwnLabel,
+            decide: decideFromLabel
         },
         "#issue": {
             pattern: /#[0-9]+/,
             suggest: function (args) {
-                var prefix, issue, content;
+                var prefix, issue;
                 prefix = this.value.prefix ? this.value.prefix + " " : "";
                 issue = (args[1] || args[0]).match(/#([0-9]+)/)[1];
 
@@ -138,9 +128,9 @@
         "new": {
             children: {
                 issue: {
-                    prefix: "this repo's",
+                    prefix: "this repo's ",
                     suggest: function (args) {
-                        var prefix = this.value.prefix ? this.value.prefix + " " : "";
+                        var prefix = this.value.prefix || "";
                         if (args[0][0] !== "!") {
                             return {
                                 content: args[0] + " " + args[1] + " issue",
@@ -160,17 +150,19 @@
                     }
                 },
                 pull: {
-                    shorthand: "easyAlias",
-                    alias: function (args) {
-                        return args[0][0] === "!" ?
-                            "!compare" :
-                            args[0] + " compare";
+                    suggest: function (args) {
+                        var alias = args[0][0] === "!" ? "!compare" : args[0] + " compare";
+                        return StepManager.suggest(alias);
+                    },
+                    decide: function (args) {
+                        var alias = args[0][0] === "!" ? "!compare" : args[0] + " compare";
+                        return StepManager.decide(alias);
                     }
                 }
             }
         },
         clone: {
-            shorthand: "repoActions",
+            suggest: suggestOwnLabel,
             decide: function (args) {
                 return getFullRepo(args).done(function (fullRepo) {
                     return "github-mac://openRepo/https://github.com/" + fullRepo;
@@ -178,7 +170,7 @@
             }
         },
         travis: {
-            shorthand: "repoActions",
+            suggest: suggestOwnLabel,
             decide: function (args) {
                 return getFullRepo(args).done(function (fullRepo) {
                     return "https://travis-ci.org/" + fullRepo
@@ -250,7 +242,6 @@
     };
 
     StepManager.loadPatterns({
-        registerShorthands: shorthands,
         "user/repo": {
             pattern: /^\w+\/[\-\w\.]*/,
             suggest: function (args) {
@@ -312,7 +303,7 @@
     var thisRepoActions = {};
     _.each(repoActions, function (value, key) {
         thisRepoActions["!" + key] = _.extend({
-            prefix: "this repo's"
+            prefix: "this repo's "
         }, value);
     });
     thisRepoActions["!@branch"].pattern = /^!@\w+/;
