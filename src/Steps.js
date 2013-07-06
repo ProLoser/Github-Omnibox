@@ -66,14 +66,14 @@ var Step = (function () {
             var suggestions = [];
             if (this.level === args.size0) {
                 if (this.startsWith(args, text) && this.value.suggest) {
-                    suggestions = suggestions.concat(this.value.suggest.call(this, args, text));
+                    suggestions = suggestions.concat(this.getSuggestValue(args, text));
                 }
                 suggestions = suggestions.concat(this.getChildSuggest(args, text));
             } else if (this.level < args.size0) {
                 if (this.match(args, text)) {
                     suggestions = suggestions.concat(this.getChildSuggest(args, text));
                     if (this.value.suggest) {
-                        suggestions = suggestions.concat(this.value.suggest.call(this, args, text));
+                        suggestions = suggestions.concat(this.getSuggestValue(args, text));
                     }
                 }
             }
@@ -94,7 +94,7 @@ var Step = (function () {
             if (this.match(args, text)) {
                 if (this.level === args.size0) {
                     if (this.value.decide) {
-                        return this.value.decide.call(this, args, text);
+                        return this.getDecideValue(args, text);
                     }
 
                 } else if (this.level < args.size0) {
@@ -119,6 +119,21 @@ var Step = (function () {
             } while (aStep = aStep.parent);
 
             return this.road = steps.join(" ");
+        },
+
+        getSuggestValue: function (args, text) {
+            if (_.isFunction(this.value.suggest)) {
+                return this.value.suggest.call(this, args, text);
+            } else {
+                return this.value.suggest;
+            }
+        },
+        getDecideValue: function (args, text) {
+            if (_.isFunction(this.value.decide)) {
+                return this.value.decide.call(this, args, text);
+            } else {
+                return this.value.decide;
+            }
         }
     };
 
