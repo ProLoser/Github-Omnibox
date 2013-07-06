@@ -1,12 +1,6 @@
 (function () {
     function getUser(args) {
-        var user;
-        if (args[0][0] == "@") {
-            user = args[0].substring(1);
-        } else {
-            user = args[0].substring(0, args[0].length - 1);
-        }
-        return user;
+        return args[0].substring(1);
     }
 
     function suggestOwnLabel(args) {
@@ -24,9 +18,8 @@
     }
 
     StepManager.loadPatterns({
-        "@user/": {
-            // TODO not sure this regex is good
-            pattern: /^\w\/$|^@\w*$/, // accepts @user and user/
+        "@user": {
+            pattern: /^@\w*$/, // accepts @user
             suggest: function (args) {
                 var user = getUser(args);
                 var suggestions = [
