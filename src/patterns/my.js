@@ -1,103 +1,86 @@
-StepManager.loadPatterns({
-    registerShorthands: {
-        straightFwd: function (value, aStep) {
-            var road = aStep.getRoad();
+(function () {
+    //suggest's the step's road
+    function suggestOwnRoad() {
+        return {
+            content: this.getRoad(),
+            description: this.getRoad()
+        };
+    }
 
-            return _.extend({
-                suggest: function () {
-                    return {
-                        content: road,
-                        description: road
-                    };
+    function decideWithUser(url) {
+        return omni.user + url;
+    }
+
+
+    StepManager.loadPatterns({
+        my: {
+            children: {
+                issues: {
+                    suggest: suggestOwnRoad,
+                    decide: "dashboard/issues"
                 },
-                decide: function () {
-                    return value.url;
-                }
-            }, value);
-        },
-        myStraightFwd: function (value, aStep) {
-            var road = aStep.getRoad();
-
-            return _.extend({
-                suggest: function () {
-                    return {
-                        content: road,
-                        description: road
-                    };
+                dash: {
+                    suggest: suggestOwnRoad,
+                    decide: ""
                 },
-                decide: function () {
-                    return omni.user + "/" + value.url;
-                }
-            }, value);
-        }
-    },
-    my: {
-        children: {
-            issues: {
-                shorthand: "straightFwd",
-                url: "dashboard/issues"
-            },
-            dash: {
-                shorthand: "straightFwd",
-                url: ""
-            },
-            pulls: {
-                shorthand: "straightFwd",
-                url: "dashboard/pulls"
-            },
-            stars: {
-                shorthand: "straightFwd",
-                url: "stars"
-            },
-            starred: {
-                shorthand: "straightFwd",
-                url: "stars"
-            },
-            settings: {
-                shorthand: "straightFwd",
-                url: "dashboard/settings"
-            },
-            followers: {
-                shorthand: "myStraightFwd",
-                url: "followers"
-            },
-            following: {
-                shorthand: "myStraightFwd",
-                url: "following"
-            },
-            repositories: {
-                shorthand: "myStraightFwd",
-                url: "?tab=repositories"
-            },
-            activities: {
-                shorthand: "myStraightFwd",
-                url: "?tab=activity"
-            },
+                pulls: {
+                    suggest: suggestOwnRoad,
+                    decide: "dashboard/pulls"
+                },
+                stars: {
+                    suggest: suggestOwnRoad,
+                    decide: "stars"
+                },
+                starred: {
+                    suggest: suggestOwnRoad,
+                    decide: "stars"
+                },
+                settings: {
+                    suggest: suggestOwnRoad,
+                    decide: "dashboard/settings"
+                },
+                followers: {
+                    suggest: suggestOwnRoad,
+                    decide: decideWithUser("/followers")
+                },
+                following: {
+                    suggest: suggestOwnRoad,
+                    decide: decideWithUser("/following")
+                },
+                repositories: {
+                    suggest: suggestOwnRoad,
+                    decide: decideWithUser("?tab=repositories")
+                },
+                activities: {
+                    suggest: suggestOwnRoad,
+                    decide: decideWithUser("?tab=activity")
+                },
 
-            auth: {
-                shorthand: "myStraightFwd",
-                decide: function () {
-                    omni.authorize();
-                    alert("You can unauthorize at any time by doing \"gh my unauth\"");
-                    return false;
-                }
-            },
-            unauth: {
-                shorthand: "myStraightFwd",
-                decide: function () {
-                    omni.unauthorize();
-                    alert('You can authorize at any time by doing "gh my auth"');
-                    return false;
-                }
-            },
-            reset: {
-                shorthand: "myStraightDwf",
-                decide: function () {
-                    omni.reset();
-                    alert('Cache has been reset'); // TODO reset or clear?
-                    return false;
+                auth: {
+                    suggest: suggestOwnRoad,
+                    decide: function () {
+                        omni.authorize();
+                        alert("You can unauthorize at any time by doing \"gh my unauth\"");
+                        return false;
+                    }
+                },
+                unauth: {
+                    suggest: suggestOwnRoad,
+                    decide: function () {
+                        omni.unauthorize();
+                        alert('You can authorize at any time by doing "gh my auth"');
+                        return false;
+                    }
+                },
+                reset: {
+                    suggest: suggestOwnRoad,
+                    decide: function () {
+                        omni.reset();
+                        alert('Cache has been reset'); // TODO reset or clear?
+                        return false;
+                    }
                 }
             }
         }
-    }
-});
+    });
+}())
