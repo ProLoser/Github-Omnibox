@@ -9,27 +9,24 @@
         return user;
     }
 
+    function suggestOwnLabel(args) {
+        return {
+            content: args[0] + " " + this.label,
+            description: args[0] + " " + this.label
+        }
+    }
+
+    //generates a decide fn
+    function decideUrlForUser(url) {
+        return function (args) {
+            return getUser(args) + url;
+        }
+    }
+
     StepManager.loadPatterns({
-        registerShorthands: {
-            userActions: function (value, aStep) {
-                return _.extend({
-                    suggest: function (args) {
-                        return {
-                            content: aStep.parent ? args[0] + " " + aStep.label : args[0],
-                            description: aStep.parent ? args[0] + " " + aStep.label : args[0]
-                        };
-                    },
-                    decide: function (args) {
-                        return getUser(args) + value.url;
-                    }
-                }, value);
-            }
-        },
         "@user/": {
             // TODO not sure this regex is good
-            pattern: /^\w*\/$|^@\w*$/, // accepts @user and user/
-            shorthand: "userActions",
-            url: "",
+            pattern: /^\w\/$|^@\w*$/, // accepts @user and user/
             suggest: function (args) {
                 var user = getUser(args);
                 var suggestions = [
@@ -48,27 +45,28 @@
                 });
                 return suggestions;
             },
+            decide: decideUrlForUser(""),
 
             children: {
                 followers: {
-                    shorthand: "userActions",
-                    url: "/followers"
+                    suggest: suggestOwnLabel,
+                    decide: decideUrlForUser("/followers")
                 },
                 following: {
-                    shorthand: "userActions",
-                    url: "/following"
+                    suggest: suggestOwnLabel,
+                    decide: decideUrlForUser("/following")
                 },
                 starred: {
-                    shorthand: "userActions",
-                    url: "/following#starred"
+                    suggest: suggestOwnLabel,
+                    decide: decideUrlForUser("/following#starred")
                 },
                 repositories: {
-                    shorthand: "userActions",
-                    url: "?tab=repositories"
+                    suggest: suggestOwnLabel,
+                    decide: decideUrlForUser("?tab=repositories")
                 },
                 activities: {
-                    shorthand: "userActions",
-                    url: "?tab=activities"
+                    suggest: suggestOwnLabel,
+                    decide: decideUrlForUser("?tab=activities")
                 }
             }
         }
