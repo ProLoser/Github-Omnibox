@@ -4,14 +4,6 @@ var StepManager = (function () {
     return {
         steps: steps,
         loadPatterns: function (patterns) {
-            if (patterns.registerShorthands) {
-                _.extend(Step.shorthands, patterns.registerShorthands);
-                delete patterns.registerShorthands;
-            }
-            if (patterns.shorthand && Step.shorthands[patterns.shorthand]) {
-                patterns = Step.shorthands[patterns.shorthand](patterns, null);
-            }
-
             _.forEach(patterns, function (value, key) {
                 steps.push(new Step(key, value, 0));
             });

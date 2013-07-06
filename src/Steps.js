@@ -16,18 +16,11 @@
  */
 var Step = (function () {
 
-    //for values
-    Step.shorthands = {};
-
     function Step(label, value, level, parent) {
         this.label = label;
+        this.value = value;
         this.level = level;
         this.parent = parent || null;
-        if (value.shorthand && Step.shorthands[value.shorthand]) {
-            this.value = Step.shorthands[value.shorthand](value, this);
-        } else {
-            this.value = value;
-        }
 
         this.pattern = value.pattern || label;
         this.children = [];
