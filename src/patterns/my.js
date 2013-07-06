@@ -8,7 +8,9 @@
     }
 
     function decideWithUser(url) {
-        return omni.user + url;
+        return function () {
+            return omni.user + url;
+        }
     }
 
 
