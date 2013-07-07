@@ -1,22 +1,4 @@
 (function () {
-    function getUser(args) {
-        return args[0].substring(1);
-    }
-
-    function suggestOwnLabel(args) {
-        return {
-            content: args[0] + " " + this.label,
-            description: args[0] + " " + this.label
-        }
-    }
-
-    //generates a decide fn
-    function decideUrlForUser(url) {
-        return function (args) {
-            return getUser(args) + url;
-        }
-    }
-
     StepManager.loadPatterns({
         "@user": {
             pattern: /^@\w*$/, // accepts @user
@@ -65,4 +47,21 @@
         }
     });
 
+    function getUser(args) {
+        return args[0].substring(1);
+    }
+
+    function suggestOwnLabel(args) {
+        return {
+            content: args[0] + " " + this.label,
+            description: args[0] + " " + this.label
+        }
+    }
+
+    //generates a decide fn
+    function decideUrlForUser(url) {
+        return function (args) {
+            return getUser(args) + url;
+        }
+    }
 }());

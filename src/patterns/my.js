@@ -1,19 +1,4 @@
 (function () {
-    //suggest's the step's road
-    function suggestOwnRoad() {
-        return {
-            content: this.getRoad(),
-            description: this.getRoad()
-        };
-    }
-
-    function decideWithUser(url) {
-        return function () {
-            return omni.user + url;
-        }
-    }
-
-
     StepManager.loadPatterns({
         my: {
             children: {
@@ -85,4 +70,19 @@
             }
         }
     });
-}())
+
+    //suggest's the step's road
+    function suggestOwnRoad() {
+        return {
+            content: this.getRoad(),
+            description: this.getRoad()
+        };
+    }
+
+    function decideWithUser(url) {
+        return function () {
+            return omni.user + url;
+        }
+    }
+
+}());

@@ -1,49 +1,4 @@
 (function () {
-    function suggestOwnLabel(args) {
-        var content;
-        if (args[0][0] === "!") {
-            content = this.label;
-        } else {
-            content = args[0] + " " + this.label;
-        }
-        return {
-            content: content,
-            description: (this.value.prefix || "") + content
-        };
-    }
-
-    function decideFromLabel(args) {
-        var label = this.label;
-        if (label[0] === "!") {
-            label = label.substring(1);
-        }
-        return getFullRepo(args).done(function (fullRepo) {
-            return fullRepo + "/" + label;
-        });
-    }
-
-    function getFullRepo(args) {
-        var defer = Defer(), firstArg = args[0];
-        if (firstArg[0] === "!") { // !
-            chrome.tabs.query({active: true, lastFocusedWindow: true}, function (tabs) {
-                var match, repo, user, tab = tabs[0];
-                if (match = tab.url.match(/github\.com\/(([\w-]+)\/([\-\w\.]+))/)) {
-                    user = match[2];
-                    repo = match[3];
-                } else if (match = tab.url.match(/([\w-]+)\.github\.io\/([\-\w\.]+)/)) {
-                    user = match[1];
-                    repo = match[2];
-                }
-                return defer.resolve(user + "/" + repo);
-            });
-        } else if (firstArg[0] === "/") { // /repo
-            defer.resolve(omni.user + "/" + firstArg.substring(1));
-        } else { // user/repo
-            defer.resolve(firstArg);
-        }
-        return defer;
-    }
-
     var repoActions = {
         io: {
             suggest: suggestOwnLabel,
@@ -317,4 +272,49 @@
 
     StepManager.loadPatterns(thisRepoActions);
 
+
+    function suggestOwnLabel(args) {
+        var content;
+        if (args[0][0] === "!") {
+            content = this.label;
+        } else {
+            content = args[0] + " " + this.label;
+        }
+        return {
+            content: content,
+            description: (this.value.prefix || "") + content
+        };
+    }
+
+    function decideFromLabel(args) {
+        var label = this.label;
+        if (label[0] === "!") {
+            label = label.substring(1);
+        }
+        return getFullRepo(args).done(function (fullRepo) {
+            return fullRepo + "/" + label;
+        });
+    }
+
+    function getFullRepo(args) {
+        var defer = Defer(), firstArg = args[0];
+        if (firstArg[0] === "!") { // !
+            chrome.tabs.query({active: true, lastFocusedWindow: true}, function (tabs) {
+                var match, repo, user, tab = tabs[0];
+                if (match = tab.url.match(/github\.com\/(([\w-]+)\/([\-\w\.]+))/)) {
+                    user = match[2];
+                    repo = match[3];
+                } else if (match = tab.url.match(/([\w-]+)\.github\.io\/([\-\w\.]+)/)) {
+                    user = match[1];
+                    repo = match[2];
+                }
+                return defer.resolve(user + "/" + repo);
+            });
+        } else if (firstArg[0] === "/") { // /repo
+            defer.resolve(omni.user + "/" + firstArg.substring(1));
+        } else { // user/repo
+            defer.resolve(firstArg);
+        }
+        return defer;
+    }
 }());
