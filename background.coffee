@@ -80,6 +80,8 @@ class Omni
             @powerPush suggestions, "!", @actions.repo, '<dim>this repo</dim> '
             @powerPush suggestions, "!new ", @actions.new, '<dim>this repo</dim> '
             @powerPush suggestions, "my new ", ['repo'], '<dim>my</dim> new '
+
+            suggestions = [] if split[1] is 'help'
                 
             switch true
                 when !!@text.match /gist ?/
@@ -88,6 +90,7 @@ class Omni
                 when !!@text.match /@[\w-]+ /, !!@text.match /[\w-]+\/ /
                     ### '@user ' ###
                     ### 'user/ ' ###
+                    suggestions = [] if split[1] is 'help'
                     @powerPush suggestions, "#{split[0]} ", @actions.user, "<dim>user</dim> #{split[0]} "
                 when @text[0] is '@'
                     ### @user ###
@@ -105,7 +108,10 @@ class Omni
                     ### /repo ###
                     @suggester @filter @text, @powerPush([], null, _.pluck(@caches.my.repos, 'full_name'), '<dim>repo</dim> '), true
                     return
-            @suggester @filter @text, suggestions
+            if split[1] is 'help'
+                @suggester suggestions if split[1] is 'help'
+            else
+                @suggester @filter @text, suggestions
 
 
     powerPush: (destination, prefix = '', source, descriptionPrefix = prefix) ->
