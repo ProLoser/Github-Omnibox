@@ -1,5 +1,5 @@
 (function () {
-    StepManager.loadPatterns({
+    StepsManager.loadPatterns({
         "@user": {
             pattern: /^@\w*$/, // accepts @user
             suggest: function (args) {

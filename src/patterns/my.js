@@ -1,5 +1,5 @@
 (function () {
-    StepManager.loadPatterns({
+    StepsManager.loadPatterns({
         my: {
             children: {
                 issues: {

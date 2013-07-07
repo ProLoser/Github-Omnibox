@@ -1,12 +1,12 @@
-StepManager.loadPatterns({
+StepsManager.loadPatterns({
     "new": {
         children: {
             issue: {
                 suggest: function (args, text) {
-                    return StepManager.suggest("!new issue");
+                    return StepsManager.suggest("!new issue");
                 },
                 decide: function (args, text) {
-                    return StepManager.decide("!new issue");
+                    return StepsManager.decide("!new issue");
                 }
             },
             repo: {

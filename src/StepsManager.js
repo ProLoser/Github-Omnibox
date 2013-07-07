@@ -1,4 +1,4 @@
-var StepManager = (function () {
+var StepsManager = (function () {
     var steps = [];
 
     return {

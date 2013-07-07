@@ -1,4 +1,4 @@
-StepManager.loadPatterns({
+StepsManager.loadPatterns({
     help: {
         suggest: function () {
             return {

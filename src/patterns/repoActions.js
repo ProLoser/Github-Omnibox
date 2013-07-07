@@ -95,11 +95,11 @@
                         //TODO don't alias suggestions
                         suggest: function (args) {
                             var alias = args[0][0] === "!" ? "!compare" : args[0] + " compare";
-                            return StepManager.suggest(alias);
+                            return StepsManager.suggest(alias);
                         },
                         decide: function (args) {
                             var alias = args[0][0] === "!" ? "!compare" : args[0] + " compare";
-                            return StepManager.decide(alias);
+                            return StepsManager.decide(alias);
                         }
                     }
                 };
@@ -202,7 +202,7 @@
         });
     }
 
-    StepManager.loadPatterns({
+    StepsManager.loadPatterns({
         "user/repo": {
             pattern: /^\w+\/[\-\w\.]*/,
             suggest: function (args) {
@@ -270,7 +270,7 @@
     thisRepoActions["!@branch"].pattern = /^!@\w+/;
     thisRepoActions["!/path"].pattern = /^!\/\w*/;
 
-    StepManager.loadPatterns(thisRepoActions);
+    StepsManager.loadPatterns(thisRepoActions);
 
 
     function suggestOwnLabel(args) {
