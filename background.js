@@ -78,7 +78,7 @@ Omni = (function () {
                     });
                     return; // stop
                 }
-                url = "search?q=" + text;
+                url = omni.urls.search + text;
             }
             _this.redirect(url);
         });

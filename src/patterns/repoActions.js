@@ -4,8 +4,7 @@
             suggest: suggestOwnLabel,
             decide: function (args) {
                 return getFullRepo(args).done(function (fullRepo) {
-                    var repo = fullRepo.split("/");
-                    return "http://" + repo[0] + ".github.io/" + repo[1];
+                    return omni.urls.io(fullRepo);
                 });
             }
         },
@@ -13,8 +12,7 @@
             suggest: suggestOwnLabel,
             decide: function (args) {
                 return getFullRepo(args).done(function (fullRepo) {
-                    var repo = fullRepo.split("/");
-                    return "http://" + repo[0] + ".github.io/" + repo[1];
+                    return omni.urls.io(fullRepo);
                 });
             }
         },
@@ -133,7 +131,7 @@
             suggest: suggestOwnLabel,
             decide: function (args) {
                 return getFullRepo(args).done(function (fullRepo) {
-                    return "github-mac://openRepo/https://github.com/" + fullRepo;
+                    return omni.urls.clone + fullRepo;
                 });
             }
         },
@@ -141,7 +139,7 @@
             suggest: suggestOwnLabel,
             decide: function (args) {
                 return getFullRepo(args).done(function (fullRepo) {
-                    return "https://travis-ci.org/" + fullRepo
+                    return omni.urls.travis + fullRepo
                 });
             }
         },

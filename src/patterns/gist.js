@@ -8,7 +8,7 @@
                 }
             },
             decide: function () {
-                return "https://gist.github.com/" + omni.user;
+                return omni.urls.gist + omni.user;
             },
             children: {
                 id: {
@@ -37,7 +37,7 @@
                         ].concat(suggestGist(args[1].replace("/", ""), null));
                     },
                     decide: function (args) {
-                        return "https://gist.github.com/" + args[1].replace("/", "");
+                        return omni.urls.gist + args[1].replace("/", "");
                     }
                 }
             }
@@ -62,6 +62,6 @@
         var info = args[1].match(/^([\w-]+\/)?([0-9]+)$/),
             user = info[1] ? info[1].replace("/", "") : omni.user;
 
-        return "https://gist.github.com/" + user + "/" + info[2];
+        return omni.urls.gist + user + "/" + info[2];
     }
 }());
