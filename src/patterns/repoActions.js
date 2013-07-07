@@ -126,40 +126,54 @@
             }
         },
         "new": {
-            children: {
-                issue: {
-                    prefix: "this repo's ",
-                    suggest: function (args) {
-                        var prefix = this.value.prefix || "";
-                        if (args[0][0] !== "!") {
+            children: (function () {
+                function suggestNew(something) {
+                    return function (args) {
+                        if (args[0][0] === "!") {
                             return {
-                                content: args[0] + " " + args[1] + " issue",
-                                description: args[0] + " " + args[1] + " issue"
-                            }
+                                content: "this repo's new " + something,
+                                description: "this repo's new" + something
+                            };
                         } else {
                             return {
-                                content: prefix + args[0] + " issue",
-                                description: prefix + args[0] + " issue"
-                            }
+                                content: args[0] + " new" + something,
+                                description: args[0] + " new" + something
+                            };
                         }
-                    },
-                    decide: function (args) {
-                        return getFullRepo(args).done(function (fullRepo) {
-                            return fullRepo + "/issues/new";
-                        })
-                    }
-                },
-                pull: {
-                    suggest: function (args) {
-                        var alias = args[0][0] === "!" ? "!compare" : args[0] + " compare";
-                        return StepManager.suggest(alias);
-                    },
-                    decide: function (args) {
-                        var alias = args[0][0] === "!" ? "!compare" : args[0] + " compare";
-                        return StepManager.decide(alias);
                     }
                 }
-            }
+
+                function decideNew(something) {
+                    return function (args) {
+                        return getFullRepo(args).done(function (fullRepo) {
+                            return fullRepo + "/" + something + "s/new";
+                        });
+                    }
+                }
+
+
+                return {
+                    issue: {
+                        suggest: suggestNew("issue"),
+                        decide: decideNew("issue")
+                    },
+                    release: {
+                        suggest: suggestNew("release"),
+                        decide: decideNew("release")
+                    },
+                    pull: {
+                        //TODO don't alias suggestions
+                        suggest: function (args) {
+                            var alias = args[0][0] === "!" ? "!compare" : args[0] + " compare";
+                            return StepManager.suggest(alias);
+                        },
+                        decide: function (args) {
+                            var alias = args[0][0] === "!" ? "!compare" : args[0] + " compare";
+                            return StepManager.decide(alias);
+                        }
+                    }
+                }
+            }())
         },
         clone: {
             suggest: suggestOwnLabel,
