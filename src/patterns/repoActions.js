@@ -127,6 +127,28 @@
         },
         "new": {
             children: (function () {
+                return {
+                    issue: {
+                        suggest: suggestNew("issue"),
+                        decide: decideNew("issue")
+                    },
+                    release: {
+                        suggest: suggestNew("release"),
+                        decide: decideNew("release")
+                    },
+                    pull: {
+                        //TODO don't alias suggestions
+                        suggest: function (args) {
+                            var alias = args[0][0] === "!" ? "!compare" : args[0] + " compare";
+                            return StepManager.suggest(alias);
+                        },
+                        decide: function (args) {
+                            var alias = args[0][0] === "!" ? "!compare" : args[0] + " compare";
+                            return StepManager.decide(alias);
+                        }
+                    }
+                };
+
                 function suggestNew(something) {
                     return function (args) {
                         if (args[0][0] === "!") {
@@ -150,29 +172,6 @@
                         });
                     }
                 }
-
-
-                return {
-                    issue: {
-                        suggest: suggestNew("issue"),
-                        decide: decideNew("issue")
-                    },
-                    release: {
-                        suggest: suggestNew("release"),
-                        decide: decideNew("release")
-                    },
-                    pull: {
-                        //TODO don't alias suggestions
-                        suggest: function (args) {
-                            var alias = args[0][0] === "!" ? "!compare" : args[0] + " compare";
-                            return StepManager.suggest(alias);
-                        },
-                        decide: function (args) {
-                            var alias = args[0][0] === "!" ? "!compare" : args[0] + " compare";
-                            return StepManager.decide(alias);
-                        }
-                    }
-                }
             }())
         },
         clone: {
@@ -191,69 +190,62 @@
                 });
             }
         },
+
         "@branch": {
-            pattern: /^@\w+/, // This pattern is changed for "!@branch"
-            suggest: function (args, text) {
-                return {
-                    content: text,
-                    description: args[0][0] === "!" ?
-                        "this repo's " + args[0].substring(1) :
-                        text
-                };
-            },
-            decide: function (args) {
-                return getFullRepo(args).done(function (fullRepo) {
-                    if (args[0][0] !== "!") {
-                        return fullRepo + "/tree/" + args[1].substring(1);
-                    } else {
-                        return fullRepo + "/tree/" + args[0].substring(2);
-                    }
-                });
-            },
+            pattern: /^@\w+/, // This pattern is changed below for "!@branch"
+            suggest: suggestOwnRoad,
+            decide: decideBranchPath,
             children: {
                 "/path": {
-                    pattern: /^\/\w+/,
-                    suggest: function (args, text) {
-                        return {
-                            content: text,
-                            description: args[0][0] === "!" ?
-                                "this repo's " + args[0].substring(1) + " " + args[1] :
-                                text
-                        };
-                    },
-                    decide: function (args) {
-                        return getFullRepo(args).done(function (fullRepo) {
-                            if (args[0][0] === "!") {
-                                return fullRepo + "/blob/" + args[0].substring(2) + args[1];
-                            } else {
-                                return fullRepo + "/blob/" + args[1].substring(1) + args[2];
-                            }
-                        });
-                    }
+                    pattern: /^\/\w*/,
+                    suggest: suggestOwnRoad,
+                    decide: decideBranchPath
                 }
             }
         },
         "/path": {
-            pattern: /^\/\w+/, // This pattern is changed for "!/path"
-            suggest: function (args, text) {
-                return {
-                    content: text,
-                    description: args[0][0] === "!" ?
-                        "this repo's " + args[0].substring(1) :
-                        text
-                };
-            },
-            decide: function (args) {
-                return getFullRepo(args).done(function (fullRepo) {
-                    if (args[0][0] === "!") {
-                        return fullRepo + "/blob/master" + args[0].substring(1);
-                    } else {
-                        return fullRepo + "/blob/master" + args[1];
-                    }
-                });
+            pattern: /^\/\w*/, // This pattern is changed below for "!/path"
+            suggest: suggestOwnRoad,
+            decide: decideBranchPath,
+            children: {
+                "@branch": {
+                    pattern: /^@\w+/,
+                    suggest: suggestOwnRoad,
+                    decide: decideBranchPath
+                }
             }
         }
     };
+
+    function suggestOwnRoad(args, text) {
+        return {
+            content: text.replace("!", "this repo's "),
+            description: text.replace("!", "this repo's ")
+        }
+    }
+    function decideBranchPath(args) {
+        var branch = "master", path = null;
+        _.each(args, function (val) {
+            val = val.replace("!", "");
+            switch(val[0]) {
+                case "@":
+                    branch = val.substring(1);
+                    break;
+                case "/":
+                    path = val.substring(1);
+                    break;
+            }
+        });
+        return getFullRepo(args).done(function (fullRepo) {
+            if (path === null) {
+                return fullRepo + "/tree/" + branch;
+            } else if(path === "") {
+                return fullRepo + "/find/" + branch;
+            } else {
+                return fullRepo + "/blob/" + branch + "/" + path;
+            }
+        });
+    }
 
     StepManager.loadPatterns({
         "user/repo": {
@@ -321,7 +313,7 @@
         }, value);
     });
     thisRepoActions["!@branch"].pattern = /^!@\w+/;
-    thisRepoActions["!/path"].pattern = /^!\/\w+/;
+    thisRepoActions["!/path"].pattern = /^!\/\w*/;
 
     StepManager.loadPatterns(thisRepoActions);
 
