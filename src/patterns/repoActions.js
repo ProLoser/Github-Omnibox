@@ -37,7 +37,7 @@
                 return defer.resolve(user + "/" + repo);
             });
         } else if (firstArg[0] === "/") { // /repo
-            defer.resolve(gh.user.name + "/" + firstArg[0].substring(1));
+            defer.resolve(omni.user + "/" + firstArg.substring(1));
         } else { // user/repo
             defer.resolve(firstArg);
         }
@@ -132,12 +132,12 @@
                         if (args[0][0] === "!") {
                             return {
                                 content: "this repo's new " + something,
-                                description: "this repo's new" + something
+                                description: "this repo's new " + something
                             };
                         } else {
                             return {
-                                content: args[0] + " new" + something,
-                                description: args[0] + " new" + something
+                                content: args[0] + " new " + something,
+                                description: args[0] + " new " + something
                             };
                         }
                     }
