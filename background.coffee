@@ -87,7 +87,7 @@ class Omni
                 when !!@text.match /gist ?/
                     ### 'gist ' ###
                     Array::unshift.apply suggestions, @suggestionsFromGists @caches.my.gists
-                when !!@text.match /@[\w-]+ /, !!@text.match /[\w-]+\/ /
+                when !!@text.match(/@[\w-]+ /), !!@text.match /[\w-]+\/ /
                     ### '@user ' ###
                     ### 'user/ ' ###
                     suggestions = [] if split[1] is 'help'
@@ -95,11 +95,11 @@ class Omni
                 when @text[0] is '@'
                     ### @user ###
                     @powerPush suggestions, "@", _.pluck(@caches.my.following, 'login'), "<dim>user</dim> @"
-                when !!@text.match /^\w+\/[\w-\.]+ /
+                when !!@text.match /^[\w-]+\/[\w-\.]+ /
                     ### 'user/repo ' ###
                     @powerPush suggestions, "#{split[0]} new ", @actions.new
                     @powerPush suggestions, "#{split[0]} ", @actions.repo
-                when !!@text.match /^\w+\//
+                when !!@text.match /^[\w-]+\//
                     ### user/ ###
                     @getTheirRepos split[0].split('/')[0], (repos) =>
                         @suggester @filter @text, @powerPush([], null, _.pluck(repos, 'full_name'), '<dim>repo</dim> '), true
@@ -176,7 +176,7 @@ class Omni
                         url = "#{@user}?tab=#{split[1]}"
                     when !split[1]
                         url = @user
-            when split[0][0] is '@', !!split[0].match /[\w-]+\//
+            when split[0][0] is '@', !!split[0].match /^[\w-]+\/$/
                 if split[0][0] is '@'
                     ### @user ###
                     url = "#{split[0].substr(1)}/"
