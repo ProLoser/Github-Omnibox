@@ -15,9 +15,9 @@ class Omni
     user: null
     actions:
         'user': ['followers', 'following', 'starred', 'repositories', 'activity']
-        'my': ['issues', 'dash', 'pulls', 'settings']
+        'my': ['issues', 'dash', 'pulls', 'settings', 'notifications']
         'new': ['issue', 'release']
-        'repo': ['io', 'pulls', 'network', 'pulse', 'settings', 'issues', 'contributors', 'compare', 'wiki', 'graphs', '#', 'tags', 'releases']
+        'repo': ['io', 'pulls', 'network', 'pulse', 'settings', 'issues', 'contributors', 'compare', 'wiki', 'graphs', '#', 'tags', 'releases', 'notifications']
     caches:
         my:
             repos: []
@@ -162,6 +162,8 @@ class Omni
                         @reset()
                         url = false
                         alert 'Cache has been cleared'
+                    when split[1] is 'notifications'
+                        url = 'notifications'
                     when !!~['dash', 'dashboard', 'home', 'news', 'feed'].indexOf(split[1])
                         url = ''
                     when !!~['stars', 'starred'].indexOf(split[1])
