@@ -49,21 +49,22 @@ Omni = (function () {
     Omni.prototype.suggest = function (text, suggester) {
         var suggestions, defaultSuggestionIndex = Infinity;
         chrome.omnibox.setDefaultSuggestion({description: "<dim>search for %s</dim>"});
+        console.log(text);
         if (this.caches.suggestions[text]) {
             suggestions = this.caches.suggestions[text];
         } else {
             suggestions = StepsManager.suggest(text);
             this.caches.suggestions[text] = suggestions;
         }
-        Defer.eachDone(suggestions, function (value, index) {
-            if (index < defaultSuggestionIndex) {
-                defaultSuggestionIndex = index;
-                chrome.omnibox.setDefaultSuggestion({ description: value.description });
+        Defer.allDone(suggestions, function (values, startingIndex) {
+            if (startingIndex < defaultSuggestionIndex) {
+                defaultSuggestionIndex = startingIndex;
+                chrome.omnibox.setDefaultSuggestion({ description: values[0].description });
+                suggester(values.slice(1));
             } else {
-                suggester([value]);
+                suggester(values);
             }
         });
-
     };
 
     Omni.prototype.decide = function (text, dontTrySuggestions) {

@@ -1,4 +1,3 @@
-
 function Defer() {
     if (!(this instanceof Defer)) {
         return new Defer();
@@ -10,13 +9,13 @@ function Defer() {
 
 Defer.prototype = {
     resolve: function (value) {
+        this.resolved = true;
         this.resolveValue = value;
         if (this.cb) {
             _.forEach(this.cb, function (cb) {
                 this.resolveValue = cb(this.resolveValue) || this.resolveValue;
             }, this);
         }
-        this.resolved = true;
         return this;
     },
     done: function (cb) {
@@ -36,6 +35,38 @@ Defer.prototype = {
     }
 };
 
+Defer.allDone = function (values, eachDone) {
+    var startingIndex;
+    console.log(values, eachDone);
+    if (_.isArray(values)) {
+        startingIndex = values.length;
+        for (var i = values.length - 1; i >= 0; i--) {
+            if (values[i] instanceof Defer) {
+                if (values[i].resolved) {
+                    startingIndex = i;
+                    values[i] = values[i].resolveValue
+                } else {
+                    (function (startingIndex) {
+                        values.splice(i, 1)[0].done(function (val) {
+                            val = _.isArray(val) ? val : [val];
+                            eachDone(val, startingIndex);
+                        });
+                    }(i));
+                }
+            } else {
+                startingIndex = i;
+            }
+        }
+        eachDone(values, startingIndex);
+
+    } else {
+        if (values instanceof Defer) {
+            values.done(eachDone);
+        } else {
+            eachDone(values);
+        }
+    }
+};
 
 Defer.eachDone = function (value, eachDone) {
     if (_.isArray(value)) {
@@ -43,8 +74,8 @@ Defer.eachDone = function (value, eachDone) {
             if (value instanceof Defer) {
                 value.done(function (value) {
                     if (_.isArray(value)) {
-                        _.each(value, function(value, i, list) {
-                            var addedIndex = (i+1) / (list.length+2);
+                        _.each(value, function (value, i, list) {
+                            var addedIndex = (i + 1) / (list.length + 2);
                             eachDone(value, index + addedIndex);
                         });
                     } else {
