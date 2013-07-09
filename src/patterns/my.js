@@ -1,6 +1,28 @@
 (function () {
     StepsManager.loadPatterns({
         my: {
+            suggest: function(){
+                var suggestions = [
+                    { content: 'my new repo', description: '<dim>my</dim> <url>new repo</url>'},
+                    { content: 'my issues', description: '<dim>my</dim> <url>issues</url>'},
+                    { content: 'my dash', description: '<dim>my</dim> <url>dash</url>'},
+                    { content: 'my pulls', description: '<dim>my</dim> <url>pulls</url>'},
+                    { content: 'my stars', description: '<dim>my</dim> <url>stars</url>'},
+                    { content: 'my starred', description: '<dim>my</dim> <url>starred</url>'},
+                    { content: 'my notifications', description: '<dim>my</dim> <url>notifications</url>'},
+                    { content: 'my settings', description: '<dim>my</dim> <url>settings</url>'},
+                    { content: 'my followers', description: '<dim>my</dim> <url>followers</url>'},
+                    { content: 'my following', description: '<dim>my</dim> <url>following</url>'},
+                    { content: 'my repositories', description: '<dim>my</dim> <url>repositories</url>'},
+                    { content: 'my activities', description: '<dim>my</dim> <url>activities</url>'},
+                    { content: 'my reset', description: '<dim>github omnibox</dim> <url>reset cache</url>' }
+                ];
+                if (localStorage.setup === 'false')
+                    suggestions.push({ content: 'my auth', description: '<dim>github omnibox</dim> <url>authorize with github</url>' });
+                if (localStorage.setup === 'true')
+                    suggestions.push({ content: 'my unauth', description: '<dim>github omnibox</dim> <url>unauthorize from github</url>' });
+                return suggestions;
+            },
             children: {
                 issues: {
                     suggest: suggestOwnRoad,
@@ -22,6 +44,10 @@
                     suggest: suggestOwnRoad,
                     decide: "stars"
                 },
+                notifications: {
+                    suggest: suggestOwnRoad,
+                    decide: "notifications"
+                },
                 settings: {
                     suggest: suggestOwnRoad,
                     decide: "dashboard/settings"
@@ -42,7 +68,6 @@
                     suggest: suggestOwnRoad,
                     decide: decideWithUser("?tab=activity")
                 },
-
                 auth: {
                     suggest: suggestOwnRoad,
                     decide: function () {

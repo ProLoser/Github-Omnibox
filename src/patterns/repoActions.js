@@ -48,6 +48,10 @@
             suggest: suggestOwnLabel,
             decide: decideFromLabel
         },
+        notifications: {
+            suggest: suggestOwnLabel,
+            decide: decideFromLabel
+        },
         graphs: {
             suggest: suggestOwnLabel,
             decide: decideFromLabel
@@ -145,24 +149,24 @@
         },
 
         "@branch": {
-            pattern: /^@\w+/, // This pattern is changed below for "!@branch"
+            pattern: /^@[\w-\.]+/, // This pattern is changed below for "!@branch"
             suggest: suggestOwnRoad,
             decide: decideBranchPath,
             children: {
                 "/path": {
-                    pattern: /^\/\w*/,
+                    pattern: /^\/\S*/,
                     suggest: suggestOwnRoad,
                     decide: decideBranchPath
                 }
             }
         },
         "/path": {
-            pattern: /^\/\w*/, // This pattern is changed below for "!/path"
+            pattern: /^\/\S*/, // This pattern is changed below for "!/path"
             suggest: suggestOwnRoad,
             decide: decideBranchPath,
             children: {
                 "@branch": {
-                    pattern: /^@\w+/,
+                    pattern: /^@[\w-\.]+/,
                     suggest: suggestOwnRoad,
                     decide: decideBranchPath
                 }

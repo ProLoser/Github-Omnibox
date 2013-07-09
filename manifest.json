@@ -1,46 +1,44 @@
 {
-    "name": "Github Omnibox",
-    "description": "Github-powered omnibox for chrome!",
-    "version": "0.0.0",
-    "background": {
-        "scripts": [
-            "lib/underscore-min.js",
-            "oauth2/oauth2.js",
+  "name": "Github Omnibox",
+  "description" : "Github-powered omnibox for chrome!",
+  "version": "1.0.0",
+  "background": {
+    "scripts": [
+      "lib/underscore-min.js",
+      "oauth2/oauth2.js",
 
-            "src/Defer.js",
-            "src/Steps.js",
-            "src/StepsManager.js",
+      "src/Defer.js",
+      "src/Steps.js",
+      "src/StepsManager.js",
 
-            "src/patterns/help.js",
-            "src/patterns/my.js",
-            "src/patterns/new.js",
-            "src/patterns/repoActions.js",
-            "src/patterns/userActions.js",
-            "src/patterns/gist.js",
+      "src/patterns/help.js",
+      "src/patterns/my.js",
+      "src/patterns/new.js",
+      "src/patterns/repoActions.js",
+      "src/patterns/userActions.js",
+      "src/patterns/gist.js",
 
-            "background.js"
-        ]
-    },
-    "content_scripts": [
-        {
-            "matches": ["https://github.com/robots.txt*"],
-            "js": ["oauth2/oauth2_inject.js"],
-            "run_at": "document_start"
-        }
-    ],
-    "omnibox": {
-        "keyword": "hg"
-    },
-    "icons": {
-        "16": "images/favicon-16.png",
-        "32": "images/favicon-32.png",
-        "114": "images/apple-touch-icon-114.png",
-        "144": "images/apple-touch-icon-144.png",
-        "512": "images/fluidicon.png"
-    },
-    "permissions": [
-        "tabs",
-        "https://github.com/login/oauth/access_token"
-    ],
-    "manifest_version": 2
+      "background.js"
+    ]
+  },
+  "content_scripts": [
+    {
+      "matches": ["https://github.com/robots.txt*"],
+      "js": ["oauth2/oauth2_inject.js"],
+      "run_at": "document_start"
+    }
+  ],
+  "omnibox": { "keyword" : "gh" },
+  "icons": {
+  	"16": "images/favicon-16.png",
+  	"32": "images/favicon-32.png",
+  	"114": "images/apple-touch-icon-114.png",
+  	"144": "images/apple-touch-icon-144.png",
+  	"512": "images/fluidicon.png"
+  },
+  "permissions": [
+    "tabs",
+    "https://github.com/login/oauth/access_token"
+  ],
+  "manifest_version": 2
 }
