@@ -48,7 +48,6 @@ Omni = (function () {
 
     Omni.prototype.suggest = function (text, suggester) {
         var suggestions, defaultSuggestionIndex = Infinity;
-        console.log(text);
         if (this.caches.suggestions[text]) {
             suggestions = this.caches.suggestions[text];
         } else {
@@ -56,7 +55,7 @@ Omni = (function () {
             this.caches.suggestions[text] = suggestions;
         }
         Defer.allDone(suggestions, function (values, startingIndex) {
-            if (startingIndex < defaultSuggestionIndex) {
+            if (startingIndex < defaultSuggestionIndex && values[0]) {
                 defaultSuggestionIndex = startingIndex;
                 chrome.omnibox.setDefaultSuggestion({ description: values[0].description });
                 suggester(values.slice(1));
@@ -64,7 +63,7 @@ Omni = (function () {
                 suggester(values);
             }
         });
-        
+
         if (defaultSuggestionIndex === Infinity) {
             chrome.omnibox.setDefaultSuggestion({description: "<dim>search for %s</dim>"});
         }

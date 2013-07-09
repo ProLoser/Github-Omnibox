@@ -18,12 +18,10 @@ Defer.prototype = {
         }
         return this;
     },
+    //could be synchronous if already resolved!
     done: function (cb) {
         if (this.resolved) {
-            var self = this;
-            setTimeout(function () {
-                self.resolveValue = cb(self.resolveValue) || self.resolveValue;
-            }, 0)
+            this.resolveValue = cb(this.resolveValue) || this.resolveValue;
         } else {
             if (!this.cb) {
                 this.cb = [cb];
@@ -37,14 +35,18 @@ Defer.prototype = {
 
 Defer.allDone = function (values, eachDone) {
     var startingIndex;
-    console.log(values, eachDone);
+    values = values.slice();
     if (_.isArray(values)) {
         startingIndex = values.length;
         for (var i = values.length - 1; i >= 0; i--) {
             if (values[i] instanceof Defer) {
                 if (values[i].resolved) {
                     startingIndex = i;
-                    values[i] = values[i].resolveValue
+                    if (_.isArray(values[i].resolveValue)) {
+                        values.splice.apply(values, [i, 1].concat(values[i].resolveValue));
+                    } else {
+                        values[i] = values[i].resolveValue
+                    }
                 } else {
                     (function (startingIndex) {
                         values.splice(i, 1)[0].done(function (val) {
