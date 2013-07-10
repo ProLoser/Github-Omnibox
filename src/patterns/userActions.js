@@ -3,7 +3,7 @@
         "@user": {
             pattern: /^@[\w-]*$/, // accepts @user
             suggest: function (args) {
-                var user = getUser(args);
+                var user = getUser(args).toLowerCase();
                 var suggestions = [
                     {
                         content: "@" + user,
@@ -11,7 +11,8 @@
                     }
                 ];
                 _.each(omni.caches.my.following, function (followedUser) {
-                    if (!user || (followedUser.login.indexOf(user) === 0 && followedUser.login !== user)) {
+                    var login = followedUser.login.toLowerCase();
+                    if (!user || (login.indexOf(user) === 0 && login !== user)) {
                         suggestions.push({
                             content: "@" + followedUser.login,
                             description: "@" + followedUser.login

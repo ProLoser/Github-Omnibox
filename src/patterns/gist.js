@@ -46,8 +46,9 @@
 
     function suggestGist(user, id) {
         var suggestions = [];
+        user = user.toLowerCase();
         _.each(omni.caches.my.gists, function (gist) {
-            if (gist.user.login === user && (!id || gist.id.indexOf(id) === 0)) {
+            if (gist.user.login.toLowerCase() === user && (!id || gist.id.indexOf(id) === 0)) {
                 var url = gist.user.login + "/" + gist.id;
                 suggestions.push({
                     content: "gist " + url,

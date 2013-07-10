@@ -210,7 +210,7 @@
             suggest: function (args) {
                 if (args.size0 > this.level) return [];
 
-                var repoName = args[0].split('/')[1];
+                var repoName = args[0].split('/')[1].toLowerCase();
                 return [
                     {
                         content: args[0],
@@ -219,7 +219,7 @@
                     omni.getTheirRepos(args[0].split('/')[0]).done(function (repos) {
                         var theirRepos = [];
                         _.each(repos, function (repo) {
-                            if (repo.name.indexOf(repoName) === 0 && repo.full_name !== args[0]) {
+                            if (repo.name.toLowerCase().indexOf(repoName) === 0) {
                                 theirRepos.push({
                                     content: repo.full_name,
                                     description: repo.full_name
@@ -239,14 +239,14 @@
         "/repo": {
             pattern: /^\/[\-\w\.]*/,
             suggest: function (args) { // TODO
-                var repoName = args[0].substring(1), myRepos = [
+                var repoName = args[0].substring(1).toLowerCase(), myRepos = [
                     {
                         content: args[0],
                         description: args[0]
                     }
                 ];
                 _.each(omni.caches.my.repos, function (repo) {
-                    if (repo.name.indexOf(repoName) === 0 && repo.name !== repoName) {
+                    if (repo.name.toLowerCase().indexOf(repoName) === 0 && repo.name.toLowerCase() !== repoName) {
                         myRepos.push({
                             content: repo.full_name,
                             description: repo.full_name
