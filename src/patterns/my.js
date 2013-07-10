@@ -91,8 +91,15 @@
                         alert('Cache has been reset'); // TODO reset or clear?
                         return false;
                     }
+                },
+                "new" : {
+                    children: {
+                        repo: {
+                            suggest: suggestOwnRoad,
+                            decide: 'new'
+                        }
+                    }
                 }
-                //TODO add 'my new repo'
             }
         }
     });

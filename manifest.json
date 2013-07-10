@@ -1,7 +1,7 @@
 {
   "name": "Github Omnibox",
   "description" : "Github-powered omnibox for chrome!",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "background": {
     "scripts": [
       "lib/underscore-min.js",
