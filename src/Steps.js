@@ -58,14 +58,14 @@ var Step = (function () {
         suggest: function (args, text) {
             var suggestions = [];
             if (this.level === args.size0) {
-                if (this.startsWith(args, text) && this.value.suggest) {
+                if (this.startsWith(args, text) && "suggest" in this.value) {
                     suggestions = suggestions.concat(this.getSuggestValue(args, text));
                 }
                 suggestions = suggestions.concat(this.getChildSuggest(args, text));
             } else if (this.level < args.size0) {
                 if (this.match(args, text)) {
                     suggestions = suggestions.concat(this.getChildSuggest(args, text));
-                    if (this.value.suggest) {
+                    if ("suggest" in this.value) {
                         suggestions = suggestions.concat(this.getSuggestValue(args, text));
                     }
                 }
@@ -86,7 +86,7 @@ var Step = (function () {
             var childDecision;
             if (this.match(args, text)) {
                 if (this.level === args.size0) {
-                    if (this.value.decide) {
+                    if ("decide" in this.value) {
                         return this.getDecideValue(args, text);
                     }
 
