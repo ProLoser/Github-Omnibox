@@ -60,18 +60,18 @@
             pattern: /#[0-9]+/,
             suggest: function (args) {
                 var prefix, issue;
-                prefix = this.value.prefix ? this.value.prefix + " " : "";
+                prefix = this.value.prefix ? "<dim>" + this.value.prefix + "</dim>" : "";
                 issue = (args[1] || args[0]).match(/#([0-9]+)/)[1];
 
                 if (args[0][0] === "!") {
                     return {
                         content: "!#" + issue,
-                        description: prefix + "#" + issue
+                        description: prefix + "issue <url>#" + issue + "</url>"
                     };
                 } else {
                     return {
                         content: args[0] + " #" + issue,
-                        description: prefix + args[0] + " #" + issue
+                        description: prefix + '<match>' + args[0] + "</match> issue <url>#" + issue + "</url>"
                     };
                 }
             },
@@ -174,17 +174,26 @@
         }
     };
 
-    function suggestOwnRoad(args, text) {
-        return {
-            content: text.replace("!", "this repo's "),
-            description: text.replace("!", "this repo's ")
+    function suggestOwnRoad(args) {
+        var prefix = this.value.prefix ? "<dim>" + this.value.prefix + "</dim>" : "";
+        if (args[0][0] === "!") {
+            return {
+                content: this.label,
+                description: prefix + "<url>" + args[0].substring(1) + " " + args.slice(1).join(" ")  + "</url>"
+            };
+        } else {
+            return {
+                content: args[0] + " " + this.label,
+                description: prefix + "<match>" + args[0] + "</match> <url>" + args.slice(1).join(" ") + "</url>"
+            };
         }
     }
+
     function decideBranchPath(args) {
         var branch = "master", path = null;
         _.each(args, function (val) {
             val = val.replace("!", "");
-            switch(val[0]) {
+            switch (val[0]) {
                 case "@":
                     branch = val.substring(1);
                     break;
@@ -196,7 +205,7 @@
         return getFullRepo(args).done(function (fullRepo) {
             if (path === null) {
                 return fullRepo + "/tree/" + branch;
-            } else if(path === "") {
+            } else if (path === "") {
                 return fullRepo + "/find/" + branch;
             } else {
                 return fullRepo + "/blob/" + branch + "/" + path;
@@ -214,7 +223,7 @@
                 return [
                     {
                         content: args[0],
-                        description: args[0]
+                        description: "<match>" + args[0] + "</match>"
                     },
                     omni.getTheirRepos(args[0].split('/')[0]).done(function (repos) {
                         var theirRepos = [];
@@ -222,7 +231,7 @@
                             if (repo.name.toLowerCase().indexOf(repoName) === 0) {
                                 theirRepos.push({
                                     content: repo.full_name,
-                                    description: repo.full_name
+                                    description: "<match>" + repo.full_name + "</match>"
                                 });
                             }
                         });
@@ -242,14 +251,14 @@
                 var repoName = args[0].substring(1).toLowerCase(), myRepos = [
                     {
                         content: args[0],
-                        description: args[0]
+                        description: "<match>" + args[0] + "</match>"
                     }
                 ];
                 _.each(omni.caches.my.repos, function (repo) {
                     if (repo.name.toLowerCase().indexOf(repoName) === 0 && repo.name.toLowerCase() !== repoName) {
                         myRepos.push({
                             content: repo.full_name,
-                            description: repo.full_name
+                            description: "<match>" + repo.full_name + "</match>"
                         });
                     }
                 });
@@ -276,16 +285,19 @@
 
 
     function suggestOwnLabel(args) {
-        var content;
+        var prefix = this.value.prefix ? "<dim>" + this.value.prefix + "</dim>" : "";
         if (args[0][0] === "!") {
-            content = this.label;
+            console.log(prefix + "<url>" + this.label.substring(1) + "</url>");
+            return {
+                content: this.label,
+                description: prefix + "<url>" + this.label.substring(1) + "</url>"
+            };
         } else {
-            content = args[0] + " " + this.label;
+            return {
+                content: args[0] + " " + this.label,
+                description: prefix + "<match>" + args[0] + "</match> <url>" + this.label + "</url>"
+            };
         }
-        return {
-            content: content,
-            description: (this.value.prefix || "") + content
-        };
     }
 
     function decideFromLabel(args) {

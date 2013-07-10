@@ -31,8 +31,8 @@
                     suggest: function (args) {
                         return [
                             {
-                                content: args.join(" ") + "/",
-                                description: args.join(" ") + "/"
+                                content: args.join(" ").replace("/", "") + "/",
+                                description: "<dim>gist</dim> <url>" + args[1].replace("/", "") + "/</url>"
                             }
                         ].concat(suggestGist(args[1].replace("/", ""), null));
                     },
@@ -52,7 +52,7 @@
                 var url = gist.user.login + "/" + gist.id;
                 suggestions.push({
                     content: "gist " + url,
-                    description: "gist <url>" + url + "</url>: <dim>" + gist.description.split('&').join('&amp;') + "</dim>"
+                    description: "<dim>gist</dim> <url>" + url + "</url>: <dim>" + gist.description.split('&').join('&amp;') + "</dim>"
                 });
             }
         });

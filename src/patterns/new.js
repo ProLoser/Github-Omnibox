@@ -2,10 +2,10 @@ StepsManager.loadPatterns({
     "new": {
         children: {
             issue: {
-                suggest: function (args, text) {
+                suggest: function () {
                     return StepsManager.suggest("!new issue");
                 },
-                decide: function (args, text) {
+                decide: function () {
                     return StepsManager.decide("!new issue");
                 }
             },

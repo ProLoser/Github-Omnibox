@@ -1,11 +1,11 @@
 (function () {
     StepsManager.loadPatterns({
         my: {
-            suggest: function(){
+            suggest: function () {
                 var suggestions = [
+                    { content: 'my dash', description: '<dim>my</dim> <url>dash</url>'},
                     { content: 'my new repo', description: '<dim>my</dim> <url>new repo</url>'},
                     { content: 'my issues', description: '<dim>my</dim> <url>issues</url>'},
-                    { content: 'my dash', description: '<dim>my</dim> <url>dash</url>'},
                     { content: 'my pulls', description: '<dim>my</dim> <url>pulls</url>'},
                     { content: 'my stars', description: '<dim>my</dim> <url>stars</url>'},
                     { content: 'my starred', description: '<dim>my</dim> <url>starred</url>'},
@@ -92,6 +92,7 @@
                         return false;
                     }
                 }
+                //TODO add 'my new repo'
             }
         }
     });
@@ -100,7 +101,7 @@
     function suggestOwnRoad() {
         return {
             content: this.getRoad(),
-            description: this.getRoad()
+            description: this.getRoad().replace(/my (.+)/, "<dim>my</dim> <url>$1</url>")
         };
     }
 
