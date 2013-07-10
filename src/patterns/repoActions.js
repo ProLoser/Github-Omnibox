@@ -206,7 +206,7 @@
 
     StepsManager.loadPatterns({
         "user/repo": {
-            pattern: /^\w+\/[\-\w\.]*/,
+            pattern: /^[\w-]+\/[-\w\.]*/,
             suggest: function (args) {
                 if (args.size0 > this.level) return [];
 
