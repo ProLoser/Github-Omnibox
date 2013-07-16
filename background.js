@@ -238,6 +238,8 @@ chrome.omnibox.onInputChanged.addListener(omni.suggest.bind(omni));
 
 chrome.omnibox.onInputStarted.addListener(omni.setup.bind(omni));
 
-chrome.omnibox.onInputEntered.addListener(omni.decide.bind(omni));
+chrome.omnibox.onInputEntered.addListener(function (text) {
+    omni.decide(text);
+});
 
 
