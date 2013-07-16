@@ -1,3 +1,3 @@
 compass compile .
 coffee -c .
-zip -r Archive.zip images/* lib/* *.js oauth2/* *.css *.json *.html
+zip -r Archive.zip images/* lib/* src/* oauth2/* *.js *.css *.json *.html
