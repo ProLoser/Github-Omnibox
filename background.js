@@ -110,11 +110,28 @@ Omni = (function () {
         localStorage.setup = 'false';
     };
 
-    Omni.prototype.query = function (url, callback, method) {
+    Omni.prototype.query = function (options, callback) {
         var xhr;
-        if (method == null) {
-            method = 'GET';
+		if (_.isString(options)) {
+			options = {
+				url: options
+			};
+		}
+		_.defaults(options, {
+			params: {},
+			method: 'GET'
+		});
+		_.defaults(options.params, {
+			per_page: 1000
+		});
+        if (this.api && this.api.getAccessToken()) {
+            options.params.access_token = this.api.getAccessToken();
         }
+		options.params = _.map(options.params, function (value, key) {
+	        return key + '=' + value;
+	    }).join('&');
+		options.url = this.urls.api + options.url + "?" + options.params;
+		
         xhr = new XMLHttpRequest();
         xhr.onreadystatechange = function (event) {
             var data, err;
@@ -127,11 +144,7 @@ Omni = (function () {
                 callback(err, data);
             }
         };
-        url = "" + this.urls.api + url;
-        if (this.api && this.api.getAccessToken()) {
-            url = "" + url + "?access_token=" + (this.api.getAccessToken()) + "&per_page=1000";
-        }
-        xhr.open(method.toUpperCase(), url, true);
+        xhr.open(options.method.toUpperCase(), options.url, true);
         xhr.setRequestHeader('Content-Type', 'application/json');
         xhr.send();
     };
@@ -149,15 +162,6 @@ Omni = (function () {
                         if (!err) Array.prototype.push.apply(_this.caches.my.repos, repos);
                     });
                 });
-            }
-        });
-    };
-
-    Omni.prototype.getStarredRepos = function () {
-        var _this = this;
-        this.query('user/starred', function (err, repos) {
-            if (!err) {
-                _this.caches.starred = repos;
             }
         });
     };
@@ -188,7 +192,8 @@ Omni = (function () {
                 repos: [],
                 orgs: [],
                 following: [],
-                gists: []
+                gists: [],
+				starred: []
             },
             their: {
                 repos: {},
@@ -201,23 +206,24 @@ Omni = (function () {
         var _this = this;
         this.clearCache();
 
-        this.query('gists', function (err, data) {
-            if (!err )Array.prototype.push.apply(_this.caches.my.gists, data);
+		if (!this.api) return;
+
+        this.getMyRepos();
+        this.query('gists', function (err, gists) {
+            if (!err ) Array.prototype.push.apply(_this.caches.my.gists, gists);
         });
-        this.query('gists/starred', function (err, data) {
-            if (!err) Array.prototype.push.apply(_this.caches.my.gists, data);
+        this.query('gists/starred', function (err, gists) {
+            if (!err) Array.prototype.push.apply(_this.caches.my.gists, gists);
         });
-        this.query('user/following', function (err, data) {
-            if (!err) _this.caches.my.following = data;
+        this.query('user/following', function (err, users) {
+            if (!err) _this.caches.my.following = users;
         });
-        //this.getMyRepos(); TODO why?
-        if (this.api) {
-            this.getMyRepos();
-            this.getStarredRepos();
-            this.query('user', function (err, data) {
-                if (!err) _this.user = data.login;
-            });
-        }
+        this.query({ url:'user/starred', params: { sort: 'updated' } }, function (err, repos) {
+            if (!err) _this.caches.starred = repos;
+        });
+        this.query('user', function (err, data) {
+            if (!err) _this.user = data.login;
+        });
     };
 
     Omni.prototype.setup = function () {
