@@ -153,6 +153,18 @@ Omni = (function () {
         });
     };
 
+    Omni.prototype.getStarredRepos = function () {
+        var _this = this;
+        this.query('user/starred', function (err, repos) {
+            if (!err) {
+                _this.caches.starred = repos;
+                defer.resolve(repos);
+            } else {
+                defer.resolve([]);
+            }
+        });
+    };
+
     Omni.prototype.getTheirRepos = function (user) {
         var _this = this,
             defer = Defer();
@@ -183,7 +195,7 @@ Omni = (function () {
             },
             their: {
                 repos: {},
-                user: null
+                        user: null
             }
         };
     };
@@ -204,6 +216,7 @@ Omni = (function () {
         //this.getMyRepos(); TODO why?
         if (this.api) {
             this.getMyRepos();
+            this.getStarredRepos();
             this.query('user', function (err, data) {
                 if (!err) _this.user = data.login;
             });
