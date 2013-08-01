@@ -158,9 +158,6 @@ Omni = (function () {
         this.query('user/starred', function (err, repos) {
             if (!err) {
                 _this.caches.starred = repos;
-                defer.resolve(repos);
-            } else {
-                defer.resolve([]);
             }
         });
     };

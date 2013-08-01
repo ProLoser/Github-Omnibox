@@ -255,7 +255,7 @@
         },
         "/repo": {
             pattern: /^\/[\-\w\.]*/,
-            suggest: function (args) { // TODO
+            suggest: function (args) {
                 var repoName = args[0].substring(1).toLowerCase(), myRepos = [
                     {
                         content: args[0],
@@ -277,9 +277,42 @@
             },
 
             children: repoActions
+        },
+        "*starred_repo": {
+            pattern: /^\*[\-\w\.]*/,
+            suggest: function (args) {
+                var repoName = args[0].substring(1).toLowerCase(), myRepos = [
+                    {
+                        content: args[0],
+                        description: "<match>" + args[0] + "</match>"
+                    }
+                ];
+                _.each(omni.caches.starred, function (repo) {
+                    if (repo.name.toLowerCase().indexOf(repoName) === 0 && repo.name.toLowerCase() !== repoName) {
+                        myRepos.push({
+                            content: repo.full_name,
+                            description: "<match>" + repo.full_name + "</match>"
+                        });
+                    }
+                });
+                return myRepos;
+            },
+            decide: function (args) {
+                var repoName = args[0].substring(1).toLowerCase(),
+                    decision = null;
+                _.each(omni.caches.starred, function (repo) {
+                    if (repo.name.toLowerCase() === repoName) {
+                        decision = repo.full_name;
+                    }
+                });
+                return decision;
+            },
+
+            children: repoActions
         }
     });
 
+    // !repoAction
     var thisRepoActions = {};
     _.each(repoActions, function (value, key) {
         thisRepoActions["!" + key] = _.extend({
@@ -334,6 +367,13 @@
             });
         } else if (firstArg[0] === "/") { // /repo
             defer.resolve(omni.user + "/" + firstArg.substring(1));
+        } else if (firstArg[0] === "*") { // *starred_repo
+            var repoName = firstArg.substring(1).toLowerCase();
+            _.each(omni.caches.starred, function (repo) {
+                if (repo.name.toLowerCase() === repoName) {
+                    defer.resolve(repo.full_name);
+                }
+            });
         } else { // user/repo
             defer.resolve(firstArg);
         }
