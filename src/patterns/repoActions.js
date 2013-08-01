@@ -151,13 +151,23 @@
             suggest: suggestOwnLabel,
             decide: function (args) {
                 return getFullRepo(args).done(function (fullRepo) {
-                    return omni.urls.travis + fullRepo
+                    return omni.urls.travis + fullRepo;
                 });
             }
         },
 
+        commits: {
+            suggest: suggestOwnLabel,
+            decide: function (args) {
+                return getFullRepo(args).done(function (fullRepo) {
+                    return fullRepo + "/commits/master";
+                });
+            }
+            // TODO add @branch for commits
+        },
+
         "@branch": {
-            pattern: /^@[\w-\.]+/, // This pattern is changed below for "!@branch"
+            pattern: /^@[-\w\.]+/, // This pattern is changed below for "!@branch"
             suggest: suggestOwnRoad,
             decide: decideBranchPath,
             children: {
@@ -174,7 +184,7 @@
             decide: decideBranchPath,
             children: {
                 "@branch": {
-                    pattern: /^@[\w-\.]+/,
+                    pattern: /^@[-\w\.]+/,
                     suggest: suggestOwnRoad,
                     decide: decideBranchPath
                 }
@@ -182,16 +192,16 @@
         }
     };
 
-    function suggestOwnRoad(args) {
+    function suggestOwnRoad(args, text) {
         var prefix = this.value.prefix ? "<dim>" + this.value.prefix + "</dim>" : "";
         if (args[0][0] === "!") {
             return {
-                content: this.label,
+                content: text,
                 description: prefix + "<url>" + args[0].substring(1) + " " + args.slice(1).join(" ")  + "</url>"
             };
         } else {
             return {
-                content: args[0] + " " + this.label,
+                content: text,
                 description: prefix + "<match>" + args[0] + "</match> <url>" + args.slice(1).join(" ") + "</url>"
             };
         }
@@ -328,7 +338,6 @@
     function suggestOwnLabel(args) {
         var prefix = this.value.prefix ? "<dim>" + this.value.prefix + "</dim>" : "";
         if (args[0][0] === "!") {
-            console.log(prefix + "<url>" + this.label.substring(1) + "</url>");
             return {
                 content: this.label,
                 description: prefix + "<url>" + this.label.substring(1) + "</url>"
