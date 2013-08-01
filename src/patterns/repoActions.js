@@ -52,6 +52,14 @@
             suggest: suggestOwnLabel,
             decide: decideFromLabel
         },
+        fork: {
+            suggest: suggestOwnLabel,
+            decide: decideFromLabel
+        },
+        releases: {
+            suggest: suggestOwnLabel,
+            decide: decideFromLabel
+        },
         graphs: {
             suggest: suggestOwnLabel,
             decide: decideFromLabel
