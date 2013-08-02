@@ -1,0 +1,5 @@
+- [ ] Request all pages for repos ( http://developer.github.com/v3/#pagination )
+- [ ] `user/repo search stuff` should search in the specified repo
+- [ ] `user/repo unmatched` should search in the specified repo
+- [ ] `user/repo issues stuff` should search in the issues of the specified repo
+- [ ] `*unmatched_repo` should redirect to https://github.com/stars?q=unmatched_repo
