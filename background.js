@@ -25,6 +25,11 @@ Omni = (function () {
     Omni.prototype.caches = null;
 
     function Omni() {
+        this.api = new OAuth2('github', {
+            client_id: '9b3a55174a275a8b56ce',
+            client_secret: 'aea80effa00cc2b98c1cc590ade40ba05cbeea1e',
+            api_scope: 'repo'
+        });
         if (localStorage.setup === 'true') {
             this.authorize();
         }
@@ -88,17 +93,10 @@ Omni = (function () {
     };
 
     Omni.prototype.authorize = function () {
-        var github,
-            _this = this;
+        var _this = this;
         localStorage.setup = 'false';
-        github = new OAuth2('github', {
-            client_id: '9b3a55174a275a8b56ce',
-            client_secret: 'aea80effa00cc2b98c1cc590ade40ba05cbeea1e',
-            api_scope: 'repo'
-        });
-        github.authorize(function () {
+        this.api.authorize(function () {
             localStorage.setup = 'true';
-            _this.api = github;
             _this.reset();
         });
     };
