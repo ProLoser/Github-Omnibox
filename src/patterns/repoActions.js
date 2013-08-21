@@ -36,6 +36,14 @@
             suggest: suggestOwnLabel,
             decide: decideFromLabel
         },
+        milestones: {
+            suggest: suggestOwnLabel,
+            decide: function (args) {
+                return getFullRepo(args).done(function (fullRepo) {
+                    return fullRepo + "/issues/milestones";
+                });
+            }
+        },
         contributors: {
             suggest: suggestOwnLabel,
             decide: decideFromLabel
