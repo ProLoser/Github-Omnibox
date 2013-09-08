@@ -1,179 +1,41 @@
-var CSS_PREFIX = "github-omnibox-";
+var menu = '<li class="github-omnibox-sidebar-item tooltipped leftwards" title="Travis CI"> \
+        <a href="http://travis-ci.org/{owner}/{repo}"> \
+            <span class="octicon github-omnibox-icon-travis"><img src="http://travis-ci.org/favicon.ico"></span> \
+            <span class="full-word"><img src="https://secure.travis-ci.org/{owner}/{repo}.png"></span> \
+        </a> \
+    </li> \
+    <li class="github-omnibox-sidebar-item tooltipped leftwards" title="Gemnasium"> \
+        <a href="https://gemnasium.com/{owner}/{repo}"> \
+            <span class="octicon github-omnibox-icon-david"><img src="https://gemnasium.com/favicon.png"></span> \
+            <span class="full-word"><img src="https://gemnasium.com/{owner}/{repo}.png"></span> \
+        </a> \
+    </li>';
 
-var heading = document.querySelector('.js-current-repository'),
-    items = [
-    {
-        img: 'https://secure.travis-ci.org/{owner}/{repo}.png',
-        url: 'http://travis-ci.org/{owner}/{repo}',
-        icon: {
-            src: "http://travis-ci.org/favicon.ico",
-            className: CSS_PREFIX + "travis-icon"
-        }
-    },{
-        img: 'https://david-dm.org/{owner}/{repo}.png',
-        url: 'https://david-dm.org/{owner}/{repo}',
-        icon: {
-            src: "http://david-dm.org/favicon.ico",
-            className: CSS_PREFIX + "david-icon"
-        }
-    }
-];
+/*
+Coveralls:
+    <li class="github-omnibox-sidebar-item tooltipped leftwards" title="Coveralls"> \
+        <a href="https://coveralls.io/r/{owner}/{repo}"> \
+            <span class="octicon github-omnibox-icon-david"><img src="http://coveralls.io/favicon.ico"></span> \
+            <span class="full-word"><img src="https://coveralls.io/repos/{owner}/{repo}/badge.png"></span> \
+        </a> \
+    </li> \
+*/ 
 
-if (heading && items && items.length) {
+var target = document.querySelector('.repo-nav-contents');
 
-    var tokens = heading.href.split('/').slice(-2),
-        sidebar = document.querySelector(".repo-container .repo-nav-contents");
+if (target) {
 
-    if (sidebar) {
-        sidebar.appendChild($el("div", {
-            className: "repo-menu-separator only-with-full-nav"
-        }));
+    var tokens = document.querySelector('.js-repo-home-link').href.split('/').slice(-2);
 
-        sidebar.appendChild($el("ul", {
-            className: "repo-menu",
-            children: items.map(function (item) {
-                return {
-                    tagName: "li",
-                    className: CSS_PREFIX + "sidebar-item",
-                    children: {
-                        "a": {
-                            href: item.url.
-                                replace('{owner}', tokens[0]).
-                                replace('{repo}', tokens[1]),
-                            children: addOptionalIcon([
-                                {
-                                    tagName: "span",
-                                    className: "full-word",
-                                    children: {
-                                        "img": {
-                                            src: item.img.
-                                                replace('{owner}', tokens[0]).
-                                                replace('{repo}', tokens[1])
-                                        }
-                                    }
-                                }
-                            ])
-                        }
-                    }
-                };
+    menu = menu.replace(/\{owner\}/g, tokens[0]).replace(/\{repo\}/g, tokens[1]);
 
-                function addOptionalIcon(children) {
-                    if (item.icon) {
-                        children.unshift(merge({tagName: "img"}, item.icon));
-                    }
-                    return children;
-                }
-            })
-        }));
-    }
-}
+    var element = document.createElement('div');
+    element.className = 'repo-menu-separator';
+    target.appendChild(element);
+    element = document.createElement('ul');
+    element.className = 'repo-menu';
+    element.innerHTML = menu;
 
+    target.appendChild(element);
 
-// ** Helper methods ** //
-
-function $el(tagName, properties) {
-    if (!properties) {
-        properties = tagName;
-        tagName = properties.tagName;
-    }
-    var el = document.createElement(tagName);
-    forEach(properties, function (value, key) {
-        switch (key) {
-            case "children":
-                if (isArray(value)) {
-                    forEach(value, function (child) {
-                        el.appendChild($el(child));
-                    });
-                } else {
-                    // relaying on v8 keeping iteration order == definition
-                    forEach(value, function (child, tagName) {
-                        el.appendChild($el(tagName, child));
-                    });
-                }
-                break;
-            case "style":
-                merge(el.style, value);
-                break;
-            default:
-                el[key] = value;
-                break;
-        }
-    });
-
-    return el;
-}
-
-
-/**
- * Invokes the `iterator` function once for each item in `obj` collection, which can be either an object or an array.
- * the `iterator` function is invoked with iterator(value, key|index), with it's `this` being the `context`
- *
- * @param {Object|Array} obj Object to iterate over
- * @param {Function} iterator Iterator function
- * @param {*} [context] The context (`this`) for the iterator function
- * @returns {*} The obj passed in
- */
-function forEach(obj, iterator, context) {
-    var key, len;
-    if (obj) {
-        if (isFn(obj)) {
-            for (key in obj) {
-                if (obj.hasOwnProperty(key) && key != "prototype" && key != "length" && key != "name") {
-                    iterator.call(context, obj[key], key);
-                }
-            }
-        } else if (isArray(obj) || obj.hasOwnProperty("length")) {
-            for (key = 0, len = obj.length; key < len; key++) {
-                iterator.call(context, obj[key], key);
-            }
-        } else if (obj.forEach && obj.forEach !== forEach) {
-            obj.forEach(iterator, context);
-        } else {
-            for (key in obj) {
-                if (obj.hasOwnProperty(key)) {
-                    iterator.call(context, obj[key], key);
-                }
-            }
-        }
-    }
-    return obj;
-}
-
-/**
- * Determine whether the argument is an array or not
- *
- * @param arr Variable to test on
- * @returns {boolean} Whether the argument is an array or not
- */
-function isArray(arr) {
-    return Object.prototype.toString.call(arr) === "[object Array]";
-}
-
-/**
- * Determine whether the argument is a function or not
- *
- * @param fn Variable to test on
- * @returns {boolean} Whether the argument is a function or not
- */
-function isFn(fn) {
-    return typeof fn === "function";
-}
-
-/**
- * Merges the `destination` and the `source` objects
- * by copying all of the properties from the source object to the destination object.
- *
- * @param {Object} destination Destination Object
- * @param {Object} source Source Object
- * @returns {Object} The mutated `destination` Object
- */
-function merge(destination, source) {
-    if (destination && source) {
-        for (var key in source) {
-            if (source.hasOwnProperty(key)) {
-                destination[key] = source[key];
-            }
-        }
-    }
-    return destination;
 }

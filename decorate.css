@@ -7,11 +7,21 @@
     vertical-align: inherit;
 }
 
-.github-omnibox-travis-icon, .github-omnibox-david-icon {
+.github-omnibox-icon-travis img, .github-omnibox-icon-david img {
     -webkit-filter: grayscale(100%);
+    filter: grayscale(100%);
     opacity: 0.6;
     height: 16px;
     width: 16px;
     margin-right: 4px;
-    margin-bottom: 1px
+    margin-bottom: 1px;
+    -webkit-transition: all ease 0.5s;
+    transition: all ease 0.5s;
+	-webkit-font-smoothing: none;
+}
+
+.github-omnibox-sidebar-item:hover .github-omnibox-icon-travis img, .github-omnibox-sidebar-item:hover .github-omnibox-icon-david img {
+	opacity: 1;
+	-webkit-filter: grayscale(0%);
+	filter: grayscale(0%);
 }
