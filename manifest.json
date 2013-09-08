@@ -26,8 +26,14 @@
       "matches": ["https://github.com/robots.txt*"],
       "js": ["oauth2/oauth2_inject.js"],
       "run_at": "document_start"
+    },
+    {
+      "matches": ["https://github.com/*"],
+      "js": ["decorate.js"],
+      "run_at": "document_end"
     }
   ],
+  "homepage_url": "https://github.com/ProLoser/Github-Omnibox",
   "omnibox": { "keyword" : "gh" },
   "icons": {
   	"16": "images/favicon-16.png",

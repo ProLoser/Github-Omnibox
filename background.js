@@ -245,6 +245,8 @@ chrome.extension.onRequest.addListener(function (message/*, sender, sendResponse
     switch (message) {
         case 'authorize':
             omni.authorize();
+        case 'decorate':
+            chrome.extension.sendMessage(localStorage);
     }
 });
 
@@ -256,4 +258,6 @@ chrome.omnibox.onInputEntered.addListener(function (text) {
     omni.decide(text);
 });
 
-
+// For use in Decorations
+localStorage['http://travis-ci.org/{owner}/{repo}'] = 'https://secure.travis-ci.org/{owner}/{repo}.png';
+localStorage['https://david-dm.org/{owner}/{repo}'] = 'https://david-dm.org/{owner}/{repo}.png';
