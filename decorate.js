@@ -1,8 +1,32 @@
 var heading = document.querySelector('.js-current-repository');
 
 var items = [
-    { img: 'https://secure.travis-ci.org/{owner}/{repo}.png', url: 'http://travis-ci.org/{owner}/{repo}' },
-    { img: 'https://david-dm.org/{owner}/{repo}.png', url: 'https://david-dm.org/{owner}/{repo}' }
+    {
+        img: 'https://secure.travis-ci.org/{owner}/{repo}.png',
+        url: 'http://travis-ci.org/{owner}/{repo}',
+        icon: {
+            img: "http://travis-ci.org/favicon.ico",
+            style: {
+                "WebkitFilter": "grayscale(100%)",
+                "opacity": "0.6",
+                "height": "16px",
+                "marginRight": "4px",
+                "marginBottom": "1px"
+            }
+        }
+    },{
+        img: 'https://david-dm.org/{owner}/{repo}.png',
+        url: 'https://david-dm.org/{owner}/{repo}',
+        icon: {
+            img: "http://david-dm.org/favicon.ico",
+            style: {
+                "WebkitFilter": "grayscale(100%)",
+                "height": "15px",
+                "marginRight": "4px",
+                "marginBottom": "2px"
+            }
+        }
+    }
 ];
 
 if (heading && items && items.length) {
@@ -26,16 +50,31 @@ if (heading && items && items.length) {
                             href: item.url.
                                 replace('{owner}', tokens[0]).
                                 replace('{repo}', tokens[1]),
-                            children: {
-                                "img": {
+                            children: addOptionalIcon([
+                                {
+                                    tagName: "img",
                                     src: item.img.
                                         replace('{owner}', tokens[0]).
                                         replace('{repo}', tokens[1])
                                 }
-                            }
+                            ])
                         }
                     }
                 };
+
+                function addOptionalIcon(children) {
+                    if (item.icon) {
+                        var icon = {
+                            tagName: "img",
+                            src: item.icon.img
+                        };
+                        if (item.icon.style) {
+                            icon.style = item.icon.style
+                        }
+                        children.unshift(icon);
+                    }
+                    return children;
+                }
             })
         }));
     }
