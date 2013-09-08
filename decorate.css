@@ -2,6 +2,11 @@
     height: 41px;
 }
 
+/* extra info to win over gh's selector */
+.with-full-navigation .github-omnibox-sidebar-item a span.full-word {
+    vertical-align: inherit;
+}
+
 .github-omnibox-travis-icon, .github-omnibox-david-icon {
     -webkit-filter: grayscale(100%);
     opacity: 0.6;

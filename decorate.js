@@ -30,7 +30,7 @@ if (heading && items && items.length) {
         }));
 
         sidebar.appendChild($el("ul", {
-            className: "repo-menu only-with-full-nav",
+            className: "repo-menu",
             children: items.map(function (item) {
                 return {
                     tagName: "li",
@@ -42,10 +42,15 @@ if (heading && items && items.length) {
                                 replace('{repo}', tokens[1]),
                             children: addOptionalIcon([
                                 {
-                                    tagName: "img",
-                                    src: item.img.
-                                        replace('{owner}', tokens[0]).
-                                        replace('{repo}', tokens[1])
+                                    tagName: "span",
+                                    className: "full-word",
+                                    children: {
+                                        "img": {
+                                            src: item.img.
+                                                replace('{owner}', tokens[0]).
+                                                replace('{repo}', tokens[1])
+                                        }
+                                    }
                                 }
                             ])
                         }
