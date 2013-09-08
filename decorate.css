@@ -1,0 +1,12 @@
+.github-omnibox-sidebar-item {
+    height: 41px;
+}
+
+.github-omnibox-travis-icon, .github-omnibox-david-icon {
+    -webkit-filter: grayscale(100%);
+    opacity: 0.6;
+    height: 16px;
+    width: 16px;
+    margin-right: 4px;
+    margin-bottom: 1px
+}

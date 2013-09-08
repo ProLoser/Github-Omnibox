@@ -1,30 +1,20 @@
-var heading = document.querySelector('.js-current-repository');
+var CSS_PREFIX = "github-omnibox-";
 
-var items = [
+var heading = document.querySelector('.js-current-repository'),
+    items = [
     {
         img: 'https://secure.travis-ci.org/{owner}/{repo}.png',
         url: 'http://travis-ci.org/{owner}/{repo}',
         icon: {
-            img: "http://travis-ci.org/favicon.ico",
-            style: {
-                "WebkitFilter": "grayscale(100%)",
-                "opacity": "0.6",
-                "height": "16px",
-                "marginRight": "4px",
-                "marginBottom": "1px"
-            }
+            src: "http://travis-ci.org/favicon.ico",
+            className: CSS_PREFIX + "travis-icon"
         }
     },{
         img: 'https://david-dm.org/{owner}/{repo}.png',
         url: 'https://david-dm.org/{owner}/{repo}',
         icon: {
-            img: "http://david-dm.org/favicon.ico",
-            style: {
-                "WebkitFilter": "grayscale(100%)",
-                "height": "15px",
-                "marginRight": "4px",
-                "marginBottom": "2px"
-            }
+            src: "http://david-dm.org/favicon.ico",
+            className: CSS_PREFIX + "david-icon"
         }
     }
 ];
@@ -44,7 +34,7 @@ if (heading && items && items.length) {
             children: items.map(function (item) {
                 return {
                     tagName: "li",
-                    style: { height: "41px" },
+                    className: CSS_PREFIX + "sidebar-item",
                     children: {
                         "a": {
                             href: item.url.
@@ -64,14 +54,7 @@ if (heading && items && items.length) {
 
                 function addOptionalIcon(children) {
                     if (item.icon) {
-                        var icon = {
-                            tagName: "img",
-                            src: item.icon.img
-                        };
-                        if (item.icon.style) {
-                            icon.style = item.icon.style
-                        }
-                        children.unshift(icon);
+                        children.unshift(merge({tagName: "img"}, item.icon));
                     }
                     return children;
                 }

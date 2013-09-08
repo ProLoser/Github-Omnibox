@@ -29,6 +29,7 @@
     },
     {
       "matches": ["https://github.com/*"],
+      "css": ["decorate.css"],
       "js": ["decorate.js"],
       "run_at": "document_end"
     }
