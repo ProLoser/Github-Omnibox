@@ -1,24 +1,20 @@
 var heading = document.querySelector('.js-current-repository');
 
-if (!heading) return;
+var items = [
+	{ img: 'https://secure.travis-ci.org/{owner}/{repo}.png', url: 'http://travis-ci.org/{owner}/{repo}' },
+	{ img: 'https://david-dm.org/{owner}/{repo}.png', url: 'https://david-dm.org/{owner}/{repo}' }
+];
 
+if (!heading || !items || !items.length) return;
 
-chrome.extension.onRequest.addListener(function (items/*, sender, sendResponse*/) {
-	if (typeof items === 'object') {
-        var tokens = heading.href.split('/').slice(-2);
+var tokens = heading.href.split('/').slice(-2);
 
-		for (var item in items) {
-			if (item === 'setup') continue;
-			var img = document.createElement('img');
-			img.src = items[item].replace('{owner}', tokens[0]).replace('{repo}', tokens[1]);
-			var link = document.createElement('a')
-			link.appendChild(img);
-			link.href = item.url.replace('{owner}', tokens[0]).replace('{repo}', tokens[1]);
-			link.setAttribute('style', 'margin-left:5px');
-			heading.parentElement.appendChild(link);
-		};
-    }
+items.forEach(function(item){
+  var img = document.createElement('img');
+  img.src = item.img.replace('{owner}', tokens[0]).replace('{repo}', tokens[1]);
+  var link = document.createElement('a')
+  link.appendChild(img);
+  link.href = item.url.replace('{owner}', tokens[0]).replace('{repo}', tokens[1]);
+  link.setAttribute('style', 'margin-left:5px');
+  heading.parentElement.appendChild(link);
 });
-
-chrome.extension.sendRequest('decorate');
-
