@@ -21,9 +21,12 @@ Coveralls:
     </li> \
 */ 
 
+// The navigation sidebar
 var target = document.querySelector('.repo-nav-contents');
+// Contains a 'public' or 'private' class for the repo
+var isPublic = document.querySelector('.entry-title');
 
-if (target) {
+if (target && isPublic && isPublic.classList.contains('public')) {
 
     var tokens = document.querySelector('.js-repo-home-link').href.split('/').slice(-2);
 
