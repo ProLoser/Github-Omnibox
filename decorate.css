@@ -7,7 +7,7 @@
     vertical-align: inherit;
 }
 
-.github-omnibox-icon-travis img, .github-omnibox-icon-david img {
+.github-omnibox-sidebar-item .octicon img {
     -webkit-filter: grayscale(100%);
     filter: grayscale(100%);
     opacity: 0.6;
@@ -20,7 +20,7 @@
 	-webkit-font-smoothing: none;
 }
 
-.github-omnibox-sidebar-item:hover .github-omnibox-icon-travis img, .github-omnibox-sidebar-item:hover .github-omnibox-icon-david img {
+.github-omnibox-sidebar-item:hover .octicon img {
 	opacity: 1;
 	-webkit-filter: grayscale(0%);
 	filter: grayscale(0%);
