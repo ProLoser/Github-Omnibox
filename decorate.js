@@ -1,25 +1,31 @@
 var menu = '<li class="github-omnibox-sidebar-item tooltipped leftwards" title="Travis CI"> \
         <a href="https://travis-ci.org/{owner}/{repo}"> \
             <span class="octicon"><img src="https://travis-ci.org/favicon.ico"></span> \
-            <span class="full-word"><img src="https://secure.travis-ci.org/{owner}/{repo}.png" alt="Travis CI" onerror="$(this).after(\'Travis CI Unavailable\')"></span> \
+            <span class="full-word"><img src="https://secure.travis-ci.org/{owner}/{repo}.png" alt="Travis CI"></span> \
         </a> \
     </li> \
     <li class="github-omnibox-sidebar-item tooltipped leftwards" title="Gemnasium"> \
         <a href="https://gemnasium.com/{owner}/{repo}"> \
             <span class="octicon"><img src="https://gemnasium.com/favicon.png"></span> \
-            <span class="full-word"><img src="https://gemnasium.com/{owner}/{repo}.png" alt="Gemnasium" onerror="$(this).after(\'Gemnasium Unavailable\')"></span> \
+            <span class="full-word"><img src="https://gemnasium.com/{owner}/{repo}.png" alt="Gemnasium"></span> \
         </a> \
     </li> \
     <li class="github-omnibox-sidebar-item tooltipped leftwards" title="David DM"> \
         <a href="https://david-dm.org/{owner}/{repo}"> \
             <span class="octicon"><img src="https://david-dm.org/favicon.ico"></span> \
-            <span class="full-word"><img src="https://david-dm.org/{owner}/{repo}.png" alt="David DM" onerror="$(this).after(\'David DM Unavailable\')"></span> \
+            <span class="full-word"><img src="https://david-dm.org/{owner}/{repo}.png" alt="David DM"></span> \
+        </a> \
+    </li> \
+    <li class="github-omnibox-sidebar-item tooltipped leftwards" title="David DM Dev"> \
+        <a href="https://david-dm.org/{owner}/{repo}#info=devDependencies"> \
+            <span class="octicon"><img src="https://david-dm.org/favicon.ico"></span> \
+            <span class="full-word"><img src="https://david-dm.org/{owner}/{repo}/dev-status.png" alt="David DM Dev"></span> \
         </a> \
     </li> \
     <li class="github-omnibox-sidebar-item tooltipped leftwards" title="Coveralls"> \
         <a href="https://coveralls.io/r/{owner}/{repo}"> \
             <span class="octicon"><img src="https://coveralls.io/favicon.ico"></span> \
-            <span class="full-word"><img src="https://coveralls.io/repos/{owner}/{repo}/badge.png" alt="Coveralls" onerror="$(this).after(\'Coveralls Unavailable\')"></span> \
+            <span class="full-word"><img src="https://coveralls.io/repos/{owner}/{repo}/badge.png" alt="Coveralls"></span> \
         </a> \
     </li>';
 
@@ -40,6 +46,12 @@ if (target && isPublic && isPublic.classList.contains('public')) {
     element = document.createElement('ul');
     element.className = 'repo-menu';
     element.innerHTML = menu;
+
+    [].forEach.call(element.querySelectorAll('img'), function(el){
+        el.addEventListener('error', function(event){
+            event.srcElement.outerHTML = event.srcElement.alt;
+        });
+    });
 
     target.appendChild(element);
 

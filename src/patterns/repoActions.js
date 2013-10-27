@@ -173,7 +173,20 @@
             }
             // TODO add @branch for commits
         },
-
+        "?search": {
+            pattern: /\?|(search ).*/,
+            suggest: suggestOwnLabel,
+            decide: function(args) {
+                return getFullRepo(args).done(function (fullRepo) {
+                    if (args[1] == 'search')
+                        args.splice(1,1);
+                    if (args[1][0] == '?')
+                        args[1] = args[1].substr(1);
+                    args = args.slice(1).join('+')
+                    return fullRepo + "/search?q=" + args;
+                });
+            }
+        },
         "@branch": {
             pattern: /^@[-\w\.]+/, // This pattern is changed below for "!@branch"
             suggest: suggestOwnRoad,

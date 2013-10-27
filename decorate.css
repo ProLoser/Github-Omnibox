@@ -1,12 +1,3 @@
-.github-omnibox-sidebar-item {
-    height: 41px;
-}
-
-/* extra info to win over gh's selector */
-.with-full-navigation .github-omnibox-sidebar-item a span.full-word {
-    vertical-align: inherit;
-}
-
 .github-omnibox-sidebar-item .octicon img {
     -webkit-filter: grayscale(100%);
     filter: grayscale(100%);
