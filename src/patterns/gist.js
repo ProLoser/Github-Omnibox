@@ -12,19 +12,32 @@
             },
             children: {
                 id: {
-                    pattern: /[0-9]+/,
+                    pattern: /^[a-z0-9]+$/,
                     suggest: function (args) {
                         return suggestGist(omni.user, args[1]);
                     },
-                    decide: decideGist
+                    decide: function(args) {
+                        return omni.urls.gist + args[1];
+                    }
+                },
+                "/id": {
+                    pattern: /^\/[a-z0-9]+$/,
+                    suggest: function (args) {
+                        return suggestGist(omni.user, args[1]);
+                    },
+                    decide: function(args) {
+                        return omni.urls.gist + omni.user + '/' + args[1];
+                    }
                 },
                 "user/id": {
-                    pattern: /^[\w-]+\/[0-9]+$/,
+                    pattern: /^[\w-]+\/[a-z0-9]+$/,
                     suggest: function (args) {
                         var info = args[1].split("/");
                         return suggestGist(info[0], info[1]);
                     },
-                    decide: decideGist
+                    decide: function(args) {
+                        return omni.urls.gist + args[1];
+                    }
                 },
                 "user/": {
                     pattern: /^[\w-]+\/?$/,
@@ -57,12 +70,5 @@
             }
         });
         return suggestions;
-    }
-
-    function decideGist(args) {
-        var info = args[1].match(/^([\w-]+\/)?([0-9]+)$/),
-            user = info[1] ? info[1].replace("/", "") : omni.user;
-
-        return omni.urls.gist + user + "/" + info[2];
     }
 }());
