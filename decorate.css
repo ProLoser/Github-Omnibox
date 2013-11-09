@@ -14,7 +14,7 @@
     margin-bottom: 1px;
     -webkit-transition: all ease 0.5s;
     transition: all ease 0.5s;
-	-webkit-font-smoothing: none;
+	-webkit-backface-visibility: hidden; /* Prevents blurring */
 }
 
 .github-omnibox-sidebar-item:hover .octicon img {
