@@ -265,16 +265,7 @@
                         description: "<match>" + args[0] + "</match>"
                     },
                     omni.getTheirRepos(args[0].split('/')[0]).done(function (repos) {
-                        var theirRepos = [];
-                        _.each(repos, function (repo) {
-                            if (repo.name.toLowerCase().indexOf(repoName) === 0) {
-                                theirRepos.push({
-                                    content: repo.full_name,
-                                    description: "<match>" + repo.full_name + "</match>"
-                                });
-                            }
-                        });
-                        return theirRepos;
+                        return filterRepos(repos, repoName);
                     })
                 ];
             },
@@ -287,19 +278,11 @@
         "/repo": {
             pattern: /^\/[\-\w\.]*/,
             suggest: function (args) {
-                var repoName = args[0].substring(1).toLowerCase(), myRepos = [
-                    {
-                        content: args[0],
-                        description: "<match>" + args[0] + "</match>"
-                    }
-                ];
-                _.each(omni.caches.my.repos, function (repo) {
-                    if (repo.name.toLowerCase().indexOf(repoName) === 0 && repo.name.toLowerCase() !== repoName) {
-                        myRepos.push({
-                            content: repo.full_name,
-                            description: "<match>" + repo.full_name + "</match>"
-                        });
-                    }
+                var repoName = args[0].substring(1).toLowerCase(), myRepos;
+                myRepos = filterRepos(omni.caches.my.repos, repoName);
+                myRepos.unshift({
+                    content: args[0],
+                    description: omni.user + "<match>" + args[0] + "</match>"
                 });
                 return myRepos;
             },
@@ -312,20 +295,12 @@
         "*starred_repo": {
             pattern: /^\*[\-\w\.]*/,
             suggest: function (args) {
-                var repoName = args[0].substring(1).toLowerCase(), myRepos = [
-                    {
-                        content: args[0],
-                        description: "<match>" + args[0] + "</match>"
-                    }
-                ];
-                _.each(omni.caches.starred, function (repo) {
-                    if (repo.name.toLowerCase().indexOf(repoName) === 0 && repo.name.toLowerCase() !== repoName) {
-                        myRepos.push({
-                            content: repo.full_name,
-                            description: "<match>" + repo.full_name + "</match>"
-                        });
-                    }
-                });
+                var repoName = args[0].substring(1).toLowerCase(), myRepos;
+                myRepos = filterRepos(omni.caches.starred, repoName);
+                myRepos.unshift({
+                    content: args[0],
+                    description: "<match>" + args[0] + "</match>"
+                })
                 return myRepos;
             },
             decide: function (args) {
@@ -408,5 +383,21 @@
             defer.resolve(firstArg);
         }
         return defer;
+    }
+
+    function filterRepos(repos, text) {
+        var filteredRepos = [];
+        _.each(repos, function (repo) {
+            if (repo.name.toLowerCase() === text.toLowerCase()) return;
+            var findName = repo.name.toLowerCase().indexOf(text);
+            if (!!~findName) {
+                // If it's the first letters, push (prepend), otherwise unshift (append)
+                filteredRepos[findName&&'push'||'unshift']({
+                    content: repo.full_name,
+                    description: repo.full_name.split(text).join("<match>" + text + "</match>")
+                });
+            }
+        });
+        return filteredRepos;
     }
 }());
