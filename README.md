@@ -8,7 +8,7 @@ Go to the options screen and add your Github credentials for personalized autoco
 Features
 --------
 
-* Address Bar Searching
+* Address Bar Searching  
   Type `gh` and press space or tab to trigger: ![How To Search](assets/how-to-search.png)  
   And when you see this the shortcuts below will work: ![How To Search](assets/search-preview.png)
   * Shortcuts
