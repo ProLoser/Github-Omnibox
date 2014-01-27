@@ -17,6 +17,14 @@ StepsManager.loadPatterns({
                     };
                 },
                 decide: "new"
+            },
+            collaborator: {
+                suggest: function() {
+                    return StepsManager.suggest("!new collaborator");
+                },
+                decide: function() {
+                    return StepsManager.decide("!new collaborator");
+                }
             }
         }
     }

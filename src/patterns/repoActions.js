@@ -119,6 +119,10 @@
                             var alias = args[0][0] === "!" ? "!compare" : args[0] + " compare";
                             return StepsManager.decide(alias);
                         }
+                    },
+                    collaborator: {
+                        suggest: suggestNew("collaborator"),
+                        decide: decideNew("settings/collaboration")
                     }
                 };
 

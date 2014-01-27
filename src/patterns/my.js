@@ -97,6 +97,10 @@
                         repo: {
                             suggest: suggestOwnRoad,
                             decide: 'new'
+                        },
+                        organization: {
+                            suggest: suggestOwnRoad,
+                            decide: 'organizations/new'
                         }
                     }
                 }
