@@ -6,7 +6,7 @@ var menu = '<li class="github-omnibox-sidebar-item tooltipped leftwards" title="
     </li> \
     <li class="github-omnibox-sidebar-item tooltipped leftwards" title="Gemnasium"> \
         <a href="https://gemnasium.com/{owner}/{repo}" class="sunken-menu-item"> \
-            <span class="octicon"><img src="https://gemnasium.com/favicon.png"></span> \
+            <span class="octicon"><img src="https://assets.gemnasium.com/assets/favicon.png"></span> \
             <span class="full-word"><img src="https://gemnasium.com/{owner}/{repo}.png" alt="Gemnasium"></span> \
         </a> \
     </li> \

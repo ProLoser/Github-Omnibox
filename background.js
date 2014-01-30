@@ -43,10 +43,8 @@ Omni = (function () {
         if (this.debug) {
             alert(url);
         } else {
-            chrome.tabs.getSelected(null, function (tab) {
-                chrome.tabs.update(tab.id, {
-                    url: url
-                });
+            chrome.tabs.query({active: true, currentWindow: true}, function (tabs) {
+                chrome.tabs.update(tabs[0].id, { url: url });
             });
         }
     };
