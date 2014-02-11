@@ -122,7 +122,11 @@
                     },
                     collaborator: {
                         suggest: suggestNew("collaborator"),
-                        decide: decideNew("settings/collaboration")
+                        decide: function(args) {
+                            return getFullRepo(args).done(function(fullRepo){
+                                return fullRepo + '/settings/collaboration';
+                            });
+                        }
                     }
                 };
 
