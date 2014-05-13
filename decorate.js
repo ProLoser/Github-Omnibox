@@ -1,34 +1,34 @@
-var menu = '<li class="github-omnibox-sidebar-item tooltipped leftwards" title="Travis CI"> \
+var menu = '<li class="github-omnibox-sidebar-item tooltipped tooltipped-w" aria-label="Travis CI"> \
         <a href="https://travis-ci.org/{owner}/{repo}" class="sunken-menu-item"> \
             <span class="octicon"><img src="https://travis-ci.org/favicon.ico"></span> \
             <span class="full-word"><img src="https://secure.travis-ci.org/{owner}/{repo}.png" alt="Travis CI"></span> \
         </a> \
     </li> \
-    <li class="github-omnibox-sidebar-item tooltipped leftwards" title="Gemnasium"> \
+    <li class="github-omnibox-sidebar-item tooltipped tooltipped-w" aria-label="Gemnasium"> \
         <a href="https://gemnasium.com/{owner}/{repo}" class="sunken-menu-item"> \
             <span class="octicon"><img src="https://assets.gemnasium.com/assets/favicon.png"></span> \
             <span class="full-word"><img src="https://gemnasium.com/{owner}/{repo}.png" alt="Gemnasium"></span> \
         </a> \
     </li> \
-    <li class="github-omnibox-sidebar-item tooltipped leftwards" title="David DM"> \
+    <li class="github-omnibox-sidebar-item tooltipped tooltipped-w" aria-label="David DM"> \
         <a href="https://david-dm.org/{owner}/{repo}" class="sunken-menu-item"> \
             <span class="octicon"><img src="https://david-dm.org/favicon.ico"></span> \
             <span class="full-word"><img src="https://david-dm.org/{owner}/{repo}.png" alt="David DM"></span> \
         </a> \
     </li> \
-    <li class="github-omnibox-sidebar-item tooltipped leftwards" title="David DM Dev"> \
+    <li class="github-omnibox-sidebar-item tooltipped tooltipped-w" aria-label="David DM Dev"> \
         <a href="https://david-dm.org/{owner}/{repo}#info=devDependencies" class="sunken-menu-item"> \
             <span class="octicon"><img src="https://david-dm.org/favicon.ico"></span> \
             <span class="full-word"><img src="https://david-dm.org/{owner}/{repo}/dev-status.png" alt="David DM Dev"></span> \
         </a> \
     </li> \
-    <li class="github-omnibox-sidebar-item tooltipped leftwards" title="Coveralls"> \
+    <li class="github-omnibox-sidebar-item tooltipped tooltipped-w" aria-label="Coveralls"> \
         <a href="https://coveralls.io/r/{owner}/{repo}" class="sunken-menu-item"> \
             <span class="octicon"><img src="https://coveralls.io/favicon.ico"></span> \
             <span class="full-word"><img src="https://coveralls.io/repos/{owner}/{repo}/badge.png" alt="Coveralls"></span> \
         </a> \
     </li> \
-    <li class="github-omnibox-sidebar-item tooltipped leftwards" title="Code Climate"> \
+    <li class="github-omnibox-sidebar-item tooltipped tooltipped-w" aria-label="Code Climate"> \
         <a href="https://codeclimate.com/github/{owner}/{repo}" class="sunken-menu-item"> \
             <span class="octicon"><img src="https://codeclimate.com/favicon.ico"></span> \
             <span class="full-word"><img src="https://codeclimate.com/github/{owner}/{repo}.png" alt="Code Climate"></span> \
