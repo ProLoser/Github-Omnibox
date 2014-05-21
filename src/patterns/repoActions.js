@@ -287,11 +287,13 @@
             pattern: /^\/[\-\w\.]*/,
             suggest: function (args) {
                 var repoName = args[0].substring(1).toLowerCase(), myRepos;
-                myRepos = filterRepos(omni.caches.my.repos, repoName);
-                myRepos.unshift({
-                    content: args[0],
-                    description: omni.user + "<match>" + args[0] + "</match>"
-                });
+                myRepos = filterRepos(omni.caches.my.repos, repoName, true);
+                if (myRepos[0] && myRepos[0].content.split('/')[0] !== omni.user) {
+                    myRepos.unshift({
+                        content: args[0],
+                        description: omni.user + "<match>" + args[0] + "</match>"
+                    });
+                }
                 return myRepos;
             },
             decide: function (args) {
@@ -304,11 +306,7 @@
             pattern: /^\*[\-\w\.]*/,
             suggest: function (args) {
                 var repoName = args[0].substring(1).toLowerCase(), myRepos;
-                myRepos = filterRepos(omni.caches.starred, repoName);
-                myRepos.unshift({
-                    content: args[0],
-                    description: "<match>" + args[0] + "</match>"
-                })
+                myRepos = filterRepos(omni.caches.starred, repoName, true);
                 return myRepos;
             },
             decide: function (args) {
@@ -393,16 +391,16 @@
         return defer;
     }
 
-    function filterRepos(repos, text) {
+    function filterRepos(repos, text, inclusive) {
         var filteredRepos = [];
         _.each(repos, function (repo) {
-            if (repo.name.toLowerCase() === text.toLowerCase()) return;
+            if (!inclusive && repo.name.toLowerCase() === text.toLowerCase()) return;
             var findName = repo.name.toLowerCase().indexOf(text);
             if (!!~findName) {
                 // If it's the first letters, push (prepend), otherwise unshift (append)
                 filteredRepos[findName&&'push'||'unshift']({
                     content: repo.full_name,
-                    description: repo.full_name.split(text).join("<match>" + text + "</match>")
+                    description: repo.full_name.replace( new RegExp( text.replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, "\\$&"), 'ig' ), '<match>$&</match>')
                 });
             }
         });
