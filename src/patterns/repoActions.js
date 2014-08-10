@@ -297,7 +297,13 @@
                 return myRepos;
             },
             decide: function (args) {
-                return omni.user + args[0];
+                var repo,
+                    repoName = args[0].substring(1).toLowerCase();
+                repo = _.find(omni.caches.my.repos, function (repo) {
+                    return repo.name.toLowerCase() === repoName;
+                });
+                if (repo)
+                    return repo.full_name;
             },
 
             children: repoActions
@@ -310,14 +316,13 @@
                 return myRepos;
             },
             decide: function (args) {
-                var repoName = args[0].substring(1).toLowerCase(),
-                    decision = null;
-                _.each(omni.caches.starred, function (repo) {
-                    if (repo.name.toLowerCase() === repoName) {
-                        decision = repo.full_name;
-                    }
+                var repo,
+                    repoName = args[0].substring(1).toLowerCase();
+                repo = _.find(omni.caches.starred, function (repo) {
+                    return repo.name.toLowerCase() === repoName;
                 });
-                return decision;
+                if (repo)
+                    return repo.full_name;
             },
 
             children: repoActions
@@ -380,11 +385,13 @@
             defer.resolve(omni.user + "/" + firstArg.substring(1));
         } else if (firstArg[0] === "*") { // *starred_repo
             var repoName = firstArg.substring(1).toLowerCase();
-            _.each(omni.caches.starred, function (repo) {
-                if (repo.name.toLowerCase() === repoName) {
-                    defer.resolve(repo.full_name);
-                }
+            var repo = _.find(omni.caches.starred, function (repo) {
+                return repo.name.toLowerCase() === repoName;
             });
+            if (repo)
+                defer.resolve(repo.full_name);
+            else
+                defer.resolve();
         } else { // user/repo
             defer.resolve(firstArg);
         }
