@@ -36,11 +36,11 @@ var menu = '<li class="github-omnibox-sidebar-item tooltipped tooltipped-w" aria
     </li>';
 
 // The navigation sidebar
-var target = document.querySelector('.sunken-menu-contents');
+var target = document.querySelector('.sunken-menu');
 // Contains a 'public' or 'private' class for the repo
 var isPublic = document.querySelector('.entry-title');
 
-var tokens = document.querySelector('.js-repo-home-link').href.split('/').slice(-2);
+var tokens = document.querySelector('.js-current-repository ').href.split('/').slice(-2);
 
 if (target && isPublic && isPublic.classList.contains('public')) {
 
