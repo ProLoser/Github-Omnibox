@@ -40,7 +40,8 @@ var target = document.querySelector('.sunken-menu');
 // Contains a 'public' or 'private' class for the repo
 var isPublic = document.querySelector('.entry-title');
 
-var tokens = document.querySelector('.js-current-repository ').href.split('/').slice(-2);
+var mainRepoLink = document.querySelector('.js-current-repository');
+var tokens = mainRepoLink && mainRepoLink.href.split('/').slice(-2);
 
 if (target && isPublic && isPublic.classList.contains('public')) {
 
@@ -74,6 +75,6 @@ if (!document.querySelector('.repository-website') && document.querySelector('[d
         var url =  'http://'+tokens[0]+'.github.io/'+tokens[1];
         element.className = 'repository-website js-details-show';
         element.innerHTML = '<p><a href="'+url+'" rel="nofollow">'+url+'</a></p>';
-        target.insertBefore(element);
+        target.parentNode.insertBefore(element, target.nextSibling);
     }
 }
