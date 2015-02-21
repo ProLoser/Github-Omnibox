@@ -2,8 +2,61 @@
 <html>
     <head>
         <title>Github-Omnibox help page</title>
+        <script src="lib/angular.min.js"></script>
+        <script>
+            function Options($scope) {
+                chrome.storage.sync.get('menu', function(data){
+                    $scope.items = data;
+                    $scope.$apply();
+                });
+                $scope.newItem = {};
+
+                save = function(){
+                    $scope.saving = true;
+                    chrome.storage.sync.set({menu:$scope.items}, function(){
+                        console.log('saved');
+                        $scope.saving = false;
+                        $scope.$apply();
+                    });
+                };
+                $scope.save = function(){
+                    $scope.items.push(newItem);
+                    $scope.newItem = {};
+                    save();
+                };
+                $scope.remove = function(index) {
+                    $scope.items.splice(index, 1);
+                    save();
+                };
+                $scope.up = function(index) {
+                    $scope.items.splice(index-1, 0, $scope.items.splice(index,1)[0]);
+                    save();
+                };
+                $scope.down = function(index) {
+                    $scope.items.splice(index, 0, $scope.items.splice(index,1)[0]);
+                    save();
+                };
+            }
+        </script>
     </head>
-    <body>
+    <body ng-app ng-controller="Options">
+        
+        <h2>Menu Items</h2>
+        <form ng-submit="save()">
+            <input ng-model="newItem.name" placeholder="name">
+            <input ng-model="newItem.icon" placeholder="icon">
+            <input ng-model="newItem.badge" placeholder="badge">
+            <input ng-model="newItem.url" placeholder="url">
+            <button>Add</button>
+        </form>
+        <ul>
+            <li ng-repeat="item in items">
+                {{item|json}}
+                <a ng-if="!$first" ng-click="up($index)">Up</a>
+                <a ng-if="!$last" ng-click="down($index)">Down</a>
+                <a ng-click="remove($index)">Remove</a>
+            </li>
+        </ul>
         <pre>
 help
 
