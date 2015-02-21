@@ -1,58 +1,50 @@
-var menu = '<li class="github-omnibox-sidebar-item tooltipped tooltipped-w" aria-label="Travis CI"> \
-        <a href="https://travis-ci.org/{owner}/{repo}" class="sunken-menu-item"> \
-            <span class="octicon"><img src="https://travis-ci.org/favicon.ico"></span> \
-            <span class="full-word"><img src="https://api.travis-ci.org/{owner}/{repo}.svg" alt="Travis CI"></span> \
-        </a> \
-    </li> \
-    <li class="github-omnibox-sidebar-item tooltipped tooltipped-w" aria-label="Gemnasium"> \
-        <a href="https://gemnasium.com/{owner}/{repo}" class="sunken-menu-item"> \
-            <span class="octicon"><img src="https://assets.gemnasium.com/assets/favicon.png"></span> \
-            <span class="full-word"><img src="https://gemnasium.com/{owner}/{repo}.svg" alt="Gemnasium"></span> \
-        </a> \
-    </li> \
-    <li class="github-omnibox-sidebar-item tooltipped tooltipped-w" aria-label="David DM"> \
-        <a href="https://david-dm.org/{owner}/{repo}" class="sunken-menu-item"> \
-            <span class="octicon"><img src="https://david-dm.org/favicon.ico"></span> \
-            <span class="full-word"><img src="https://david-dm.org/{owner}/{repo}.svg" alt="David DM"></span> \
-        </a> \
-    </li> \
-    <li class="github-omnibox-sidebar-item tooltipped tooltipped-w" aria-label="David DM Dev"> \
-        <a href="https://david-dm.org/{owner}/{repo}#info=devDependencies" class="sunken-menu-item"> \
-            <span class="octicon"><img src="https://david-dm.org/favicon.ico"></span> \
-            <span class="full-word"><img src="https://david-dm.org/{owner}/{repo}/dev-status.svg" alt="David DM Dev"></span> \
-        </a> \
-    </li> \
-    <li class="github-omnibox-sidebar-item tooltipped tooltipped-w" aria-label="Coveralls"> \
-        <a href="https://coveralls.io/r/{owner}/{repo}" class="sunken-menu-item"> \
-            <span class="octicon"><img src="https://coveralls.io/favicon.ico"></span> \
-            <span class="full-word"><img src="https://img.shields.io/coveralls/{owner}/{repo}.svg" alt="Coveralls"></span> \
-        </a> \
-    </li> \
-    <li class="github-omnibox-sidebar-item tooltipped tooltipped-w" aria-label="Code Climate"> \
-        <a href="https://codeclimate.com/github/{owner}/{repo}" class="sunken-menu-item"> \
-            <span class="octicon"><img src="https://codeclimate.com/favicon.ico"></span> \
-            <span class="full-word"><img src="https://codeclimate.com/github/{owner}/{repo}.svg" alt="Code Climate"></span> \
+function Decorator() {
+    var mainRepoLink = document.querySelector('.js-current-repository');
+    var tokens = mainRepoLink && mainRepoLink.href.split('/').slice(-2);
+    this.owner = tokens[0];
+    this.repo = tokens[1];
+
+}
+Decorator.prototype.owner = '';
+Decorator.prototype.repo = '';
+
+Decorator.prototype.isPublic = function() {
+    var isPublic = document.querySelector('.entry-title');
+    return isPublic && isPublic.classList.contains('public');
+};
+
+
+Decorator.prototype.img = function(src, alt) {
+    return '<img src="'+src+'" alt="'+alt+'" />';
+};
+
+Decorator.prototype.row = function(data) {
+    var isIconUrl = data.icon && data.icon.substr(0, 4) == 'http';
+
+    var icon;
+
+    if (isIconUrl)
+        icon = '<span class="octicon">' + this.img(data.icon, data.name) + '</span>';
+    else
+        icon = '<span class="octicon +' + data.icon +'+"></span>';
+
+    var tmpl = '<li class="github-omnibox-sidebar-item tooltipped tooltipped-w" aria-label="'+data.name+'"> \
+        <a href="'+data.url+'" class="sunken-menu-item">'+icon+' \
+            <span class="full-word">'+ (data.badge && this.img(data.badge, data.name) || data.name) +'</span> \
         </a> \
     </li>';
+    return tmpl.replace(/:owner/g, this.owner).replace(/:repo/g, this.repo);
+};
 
-// The navigation sidebar
-var target = document.querySelector('.sunken-menu');
-// Contains a 'public' or 'private' class for the repo
-var isPublic = document.querySelector('.entry-title');
-
-var mainRepoLink = document.querySelector('.js-current-repository');
-var tokens = mainRepoLink && mainRepoLink.href.split('/').slice(-2);
-
-if (target && isPublic && isPublic.classList.contains('public')) {
-
-    menu = menu.replace(/\{owner\}/g, tokens[0]).replace(/\{repo\}/g, tokens[1]);
-
+Decorator.prototype.addMenu = function(items) {
+    var target = document.querySelector('.sunken-menu');
+    if (!target) return;
     var element = document.createElement('div');
     element.className = 'sunken-menu-separator';
     target.appendChild(element);
     element = document.createElement('ul');
     element.className = 'sunken-menu-group omnibox-menu';
-    element.innerHTML = menu;
+    element.innerHTML = items.map(this.row, this).join('');
 
     [].forEach.call(element.querySelectorAll('img'), function(el){
         el.addEventListener('error', function(event){
@@ -63,18 +55,77 @@ if (target && isPublic && isPublic.classList.contains('public')) {
     });
 
     target.appendChild(element);
+};
 
-}
+Decorator.prototype.addUrl = function() {
+    // Is there a gh-pages branch but no project URL?
+    if (!document.querySelector('.repository-website') && document.querySelector('[data-name="gh-pages"]')) {
+        var target = document.querySelector('.repository-description');
+        if (target) {
+            element = document.createElement('div');
 
-// Is there a gh-pages branch but no project URL?
-if (!document.querySelector('.repository-website') && document.querySelector('[data-name="gh-pages"]')) {
-    target = document.querySelector('.repository-description');
-    if (target) {
-        element = document.createElement('div');
-        if (!tokens[1]) tokens[1] = '';
-        var url =  'http://'+tokens[0]+'.github.io/'+tokens[1];
-        element.className = 'repository-website js-details-show';
-        element.innerHTML = '<p><a href="'+url+'" rel="nofollow">'+url+'</a></p>';
-        target.parentNode.insertBefore(element, target.nextSibling);
+            var url = this.owner + '.github.io';
+            if (!this.repo.endsWith('.github.io') && !this.repo.endsWith('.github.com'))
+                url += '/' + this.repo;
+            element.className = 'repository-website js-details-show';
+            element.innerHTML = '<p><a href="http://'+url+'" class="edit-link">'+url+'</a></p>';
+            target.parentNode.insertBefore(element, target.nextSibling);
+        }
     }
+};
+
+String.prototype.endsWith = function(suffix) {
+    return this.indexOf(suffix, this.length - suffix.length) !== -1;
+};
+
+var menu = [
+    {
+        name: 'Gitter Chat',
+        icon: 'https://cdn01.gitter.im/_s/1b5c955/images/favicon5.png',
+        badge: 'https://badges.gitter.im/:owner/:repo.png',
+        url: 'https://gitter.im/:owner/:repo'
+    },
+    {
+        name: 'Travis CI',
+        icon: 'https://travis-ci.org/favicon.ico',
+        badge: 'https://api.travis-ci.org/:owner/:repo.svg',
+        url: 'https://travis-ci.org/:owner/:repo'
+    },
+    {
+        name: 'Gemnasium',
+        icon: 'https://assets.gemnasium.com/assets/favicon.png',
+        badge: 'https://david-dm.org/:owner/:repo.svg',
+        url: 'https://david-dm.org/:owner/:repo'
+    },
+    {
+        name: 'David DM',
+        icon: 'https://david-dm.org/favicon.ico',
+        badge: 'https://david-dm.org/:owner/:repo.svg',
+        url: 'https://david-dm.org/:owner/:repo'
+    },
+    {
+        name: 'David DM Dev',
+        icon: 'https://david-dm.org/favicon.ico',
+        badge: 'https://david-dm.org/:owner/:repo/dev-status.svg',
+        url: 'https://david-dm.org/:owner/:repo#info=devDependencies'
+    },
+    {
+        name: 'Coveralls',
+        icon: 'https://coveralls.io/favicon.ico',
+        badge: 'https://img.shields.io/coveralls/:owner/:repo.svg',
+        url: 'https://coveralls.io/r/:owner/:repo'
+    },
+    {
+        name: 'Code Climate',
+        icon: 'https://codeclimate.com/favicon.ico',
+        badge: 'https://codeclimate.com/github/:owner/:repo.svg',
+        url: 'https://codeclimate.com/github/:owner/:repo'
+    }
+];
+
+var page = new Decorator();
+
+if (page.isPublic()) {
+    page.addMenu(menu);
+    page.addUrl();
 }
