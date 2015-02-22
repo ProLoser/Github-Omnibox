@@ -28,10 +28,11 @@
     </head>
     <body ng-app="Help" ng-controller="Options" class="container">
         
-        <h2>Menu Items <span style="color:green" ng-show="saved">SAVED!</span></h2>
+        <h1>Menu Items <span style="color:green" ng-show="saved">SAVED!</span></h1>
         <form ng-submit="save()">
-            <p>Please use <code>:owner</code> and <code>:repo</code> tokens as necessary</p>
-            <p>All icons and badges must be HTTPS urls.</p>
+            <p>You can use <code>:owner</code> and <code>:repo</code> tokens.</p>
+            <p>Icon and badge URLs must be <code>https</code>.</p>
+            <p>Badges that don't load will be hidden.</p>
             <p class="form-group">
                 <label class="control-label">
                     Name
@@ -57,7 +58,6 @@
                 <input class="form-control" ng-model="newItem.url" placeholder="http://example.com/:owner/:repo">
             </p>
             <p>
-                <button class="btn btn-primary">Add</button>
                 Results: 
                 <span>
                     <a target="_blank" class="render" ng-href="{{newItem.url | test : test.owner : test.repo}}">
@@ -69,11 +69,14 @@
                     </a>
                 </span>
             </p>
+            <p>
+                <button class="btn btn-primary">Save</button>
+            </p>
         </form>
-        <p>
-            Test:
-            <input ng-model="test.owner" placeholder="Owner">
-            <input ng-model="test.repo" placeholder="Repo">
+        <p class="form-group">
+            <label class="control-label">Test Repo:</label>
+            <input class="" ng-model="test.owner" placeholder="Owner">
+            <input class="" ng-model="test.repo" placeholder="Repo">
         </p>
         <ul class="list-group">
             <li ng-repeat="item in items track by $index" class="list-group-item">
@@ -96,9 +99,9 @@
                 </div>
             </li>
         </ul>
-        <pre>
-help
 
+<h1>Omnibox Commands</h1>
+<pre>
 my auth
 my unauth
 my reset
@@ -190,8 +193,6 @@ user/repo /path
 gist
 gist id
 gist user
-gist user/id
-
-        </pre>
+gist user/id</pre>
     </body>
 </html>
