@@ -26,7 +26,7 @@ Decorator.prototype.row = function(data) {
     if (isIconUrl)
         icon = '<span class="octicon">' + this.img(data.icon, data.name) + '</span>';
     else
-        icon = '<span class="octicon +' + data.icon +'+"></span>';
+        icon = '<span class="octicon octicon-' + data.icon +'"></span>';
 
     var tmpl = '<li class="github-omnibox-sidebar-item tooltipped tooltipped-w" aria-label="'+data.name+'"> \
         <a href="'+data.url+'" class="sunken-menu-item">'+icon+' \
@@ -120,12 +120,19 @@ var menu = [
         icon: 'https://codeclimate.com/favicon.ico',
         badge: 'https://codeclimate.com/github/:owner/:repo.svg',
         url: 'https://codeclimate.com/github/:owner/:repo'
+    },
+    {
+        name: 'Github Omnibox',
+        icon: 'tools',
+        url: chrome.extension.getURL('help.html')
     }
 ];
 
 var page = new Decorator();
 
 if (page.isPublic()) {
-    page.addMenu(menu);
     page.addUrl();
+    chrome.storage.sync.get({menu:menu}, function(data){
+        page.addMenu(data.menu);
+    });
 }

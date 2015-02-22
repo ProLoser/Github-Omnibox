@@ -41,6 +41,7 @@
   ],
   "homepage_url": "https://github.com/ProLoser/Github-Omnibox",
   "omnibox": { "keyword" : "gh" },
+  "options_page": "help.html",
   "icons": {
   	"16": "images/favicon-16.png",
   	"32": "images/favicon-32.png",

@@ -2,59 +2,98 @@
 <html>
     <head>
         <title>Github-Omnibox help page</title>
-        <script src="lib/angular.min.js"></script>
-        <script>
-            function Options($scope) {
-                chrome.storage.sync.get('menu', function(data){
-                    $scope.items = data;
-                    $scope.$apply();
-                });
-                $scope.newItem = {};
-
-                save = function(){
-                    $scope.saving = true;
-                    chrome.storage.sync.set({menu:$scope.items}, function(){
-                        console.log('saved');
-                        $scope.saving = false;
-                        $scope.$apply();
-                    });
-                };
-                $scope.save = function(){
-                    $scope.items.push(newItem);
-                    $scope.newItem = {};
-                    save();
-                };
-                $scope.remove = function(index) {
-                    $scope.items.splice(index, 1);
-                    save();
-                };
-                $scope.up = function(index) {
-                    $scope.items.splice(index-1, 0, $scope.items.splice(index,1)[0]);
-                    save();
-                };
-                $scope.down = function(index) {
-                    $scope.items.splice(index, 0, $scope.items.splice(index,1)[0]);
-                    save();
-                };
-            }
-        </script>
+        <script src="lib/angular.min.js" ng-csp></script>
+        <script src="help.js"></script>
+        <link rel="stylesheet" href="lib/bootstrap.min.css" />
+        <link rel="stylesheet" href="lib/octicons/octicons.css" />
+        <style>
+        .ng-hide {
+            display: none;
+        }
+        .render .octicon, .render .octicon img {
+            -webkit-filter: grayscale(100%);
+            opacity: 0.6;
+            height: 16px;
+            width: 16px;
+            margin-right: 4px;
+            margin-bottom: 1px;
+            transition: all 0.5s ease;
+            -webkit-transition: all 0.5s ease;
+            -webkit-backface-visibility: hidden;
+        }
+        a.render:hover .octicon, a.render:hover .octicon img {
+            opacity: 1;
+        }
+        </style>
     </head>
-    <body ng-app ng-controller="Options">
+    <body ng-app="Help" ng-controller="Options" class="container">
         
-        <h2>Menu Items</h2>
+        <h2>Menu Items <span style="color:green" ng-show="saved">SAVED!</span></h2>
         <form ng-submit="save()">
-            <input ng-model="newItem.name" placeholder="name">
-            <input ng-model="newItem.icon" placeholder="icon">
-            <input ng-model="newItem.badge" placeholder="badge">
-            <input ng-model="newItem.url" placeholder="url">
-            <button>Add</button>
+            <p>Please use <code>:owner</code> and <code>:repo</code> tokens as necessary</p>
+            <p>All icons and badges must be HTTPS urls.</p>
+            <p class="form-group">
+                <label class="control-label">
+                    Name
+                </label>
+                <input class="form-control" ng-model="newItem.name" placeholder="Example">
+            </p>
+            <p class="form-group">
+                <label class="control-label">
+                    Icon (URL or <a target="_blank" href="https://octicons.github.com/">octicon</a> name)
+                </label>
+                <input class="form-control" ng-model="newItem.icon" placeholder="https://example.com/favicon.ico or dashboard">
+            </p>
+            <p class="form-group">
+                <label class="control-label">
+                    Badge (optional, name will be used if left empty)
+                </label>
+                <input class="form-control" ng-model="newItem.badge" placeholder="https://badges.example.com/:owner/:repo.svg">
+            </p>
+            <p class="form-group">
+                <label class="control-label">
+                    URL (when menu item is clicked)
+                </label>
+                <input class="form-control" ng-model="newItem.url" placeholder="http://example.com/:owner/:repo">
+            </p>
+            <p>
+                <button class="btn btn-primary">Add</button>
+                Results: 
+                <span>
+                    <a target="_blank" class="render" ng-href="{{newItem.url | test : test.owner : test.repo}}">
+                        <i class="octicon octicon-{{newItem.icon}}">
+                            <img ng-if="newItem.icon.indexOf('https:') == 0" ng-src="{{newItem.icon | test : test.owner : test.repo}}" />
+                        </i>
+                        <img ng-if="newItem.badge" ng-src="{{newItem.badge | test : test.owner : test.repo}}" />
+                        {{newItem.name | test : test.owner : test.repo}}
+                    </a>
+                </span>
+            </p>
         </form>
-        <ul>
-            <li ng-repeat="item in items">
-                {{item|json}}
-                <a ng-if="!$first" ng-click="up($index)">Up</a>
-                <a ng-if="!$last" ng-click="down($index)">Down</a>
-                <a ng-click="remove($index)">Remove</a>
+        <p>
+            Test:
+            <input ng-model="test.owner" placeholder="Owner">
+            <input ng-model="test.repo" placeholder="Repo">
+        </p>
+        <ul class="list-group">
+            <li ng-repeat="item in items track by $index" class="list-group-item">
+                <div class="row">
+                    <div class="col-xs-2">
+                        <span class="btn-group">
+                            <button class="btn btn-default" ng-click="up($index)" ng-disabled="$first"><i class="octicon octicon-arrow-up"></i></button>
+                            <button class="btn btn-default" ng-click="remove($index)"><i class="octicon octicon-trashcan"></i></button>
+                            <button class="btn btn-default" ng-disabled="$last" ng-click="down($index)"><i class="octicon octicon-arrow-down"></i></button>
+                        </span>
+                    </div>
+                    <div class="col-xs-10">
+                        <a target="_blank" class="render" ng-href="{{item.url | test : test.owner : test.repo}}">
+                            <i class="octicon octicon-{{item.icon}}">
+                                <img ng-if="item.icon.indexOf('https:') == 0" ng-src="{{item.icon | test : test.owner : test.repo}}" />
+                            </i>
+                            <img ng-if="item.badge" ng-src="{{item.badge | test : test.owner : test.repo}}" />
+                            {{item.name | test : test.owner : test.repo}}</a>
+                    </div>
+                </div>
             </li>
         </ul>
         <pre>
