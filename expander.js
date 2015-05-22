@@ -1,6 +1,6 @@
 // TODO This isn't working
 $(window).on('popstate', function(){
-  console.log(arguments);
+  debugger;
   if ($('.file-header').length && !$('.omnibox-collapse').length) {
     load();
   }
@@ -22,16 +22,17 @@ function load() {
     }
   });
 
-  $('[aria-label="View the whole file"]').after($toggler);
+  $('.file-actions').append($toggler);
 
   var visible = true;
 
-  $('.table-of-contents .btn-group').after('<a class="octicon-btn tooltipped tooltipped-nw right omnibox-collapse" href="#expand-collapse-all" aria-label="Expand / Collapse All"> \
+  $toggler = $('<a class="octicon-btn tooltipped tooltipped-nw right omnibox-collapse" href="#expand-collapse-all" aria-label="Expand / Collapse All"> \
     <span class="octicon octicon-unfold"></span> \
-  </a>').next().on('click', function(event){
+  </a>').on('click', function(event){
     event.preventDefault();
     $('.data').toggle(visible = !visible);
   });
 
+  $('.table-of-contents .btn-group').before($toggler);
 }
 load();
