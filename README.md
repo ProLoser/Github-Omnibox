@@ -33,12 +33,10 @@ Features
     * Suggest followed users: `gh @[user-name]`
     * Suggest owned gists: `gh gist /[gist-id]`
 * Url to **gh-pages** if the branch exists but the project url doesn't
-* Build Status and Dependency Status Badges  
+* Build Status and Dependency Status Bars  
 ![Status Bars](assets/status-bars.png)
   * TravisCI - Continuous Integration (Build Status)
   * DavisDM - Dependencies
   * Gemnasium - Dependencies
   * Coveralls - Code Coverage
   * Code Climate - Code Coverage
-  * GitterIM - Github chat rooms
-  * **Ability to customize and add new ones yourself!**

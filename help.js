@@ -54,7 +54,6 @@ module.controller('Options', function($scope, $timeout) {
         $scope.items = data.menu;
         $scope.$apply();
     });
-    $scope.newItem = {};
     $scope.test = {
         owner: 'angular',
         repo: 'angular'
@@ -73,10 +72,24 @@ module.controller('Options', function($scope, $timeout) {
         });
     };
     $scope.save = function(){
-        $scope.items.push($scope.newItem);
-        $scope.newItem = {};
+        if ($scope.editingIndex)
+            $scope.items[$scope.editingIndex] = $scope.formItem;
+        else
+            $scope.items.push($scope.formItem);
         save();
+        $scope.reset();
     };
+    $scope.edit = function(index) {
+        $scope.formItem = angular.copy($scope.items[index]);
+        $scope.editingIndex = index;
+    };
+
+    $scope.reset = function() {
+        $scope.editingIndex = null;
+        $scope.formItem = {};
+    };
+    $scope.reset();
+    
     $scope.remove = function(index) {
         if (confirm('Are you sure?')) {
             $scope.items.splice(index, 1);

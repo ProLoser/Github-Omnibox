@@ -1,63 +1,36 @@
 {
-  "name": "Github Omnibox",
-  "short_name": "Github Omni",
-  "description" : "Github-powered omnibox for chrome!",
-  "version": "1.6.0",
-  "background": {
-    "scripts": [
-      "lib/underscore-min.js",
-      "oauth2/oauth2.js",
-
-      "src/Defer.js",
-      "src/Steps.js",
-      "src/StepsManager.js",
-
-      "src/patterns/help.js",
-      "src/patterns/my.js",
-      "src/patterns/new.js",
-      "src/patterns/repoActions.js",
-      "src/patterns/userActions.js",
-      "src/patterns/gist.js",
-
-      "background.js"
-    ]
-  },
-  "content_scripts": [
-    {
-      "matches": ["https://github.com/robots.txt*"],
-      "js": ["oauth2/oauth2_inject.js"],
+   "background": {
+      "scripts": [ "lib/underscore-min.js", "oauth2/oauth2.js", "src/Defer.js", "src/Steps.js", "src/StepsManager.js", "src/patterns/help.js", "src/patterns/my.js", "src/patterns/new.js", "src/patterns/repoActions.js", "src/patterns/userActions.js", "src/patterns/gist.js", "background.js" ]
+   },
+   "content_scripts": [ {
+      "js": [ "oauth2/oauth2_inject.js" ],
+      "matches": [ "https://github.com/robots.txt*" ],
       "run_at": "document_start"
-    },
-    {
-      "matches": ["https://github.com/*"],
-      "css": ["decorate.css"],
-      "js": ["decorate.js"],
+   }, {
+      "css": [ "decorate.css" ],
+      "js": [ "decorate.js" ],
+      "matches": [ "*://*.github.com/*" ],
       "run_at": "document_end"
-    },
-    {
-      "matches": ["https://github.com/*"],
-      "js": ["lib/jquery.min.js", "expander.js"],
-      "run_at": "document_end"
-    }
-  ],
-  "web_accessible_resources": [
-    "oauth2/oauth2.html",
-    "help.html"
-  ],
-  "homepage_url": "https://github.com/ProLoser/Github-Omnibox",
-  "omnibox": { "keyword" : "gh" },
-  "options_page": "help.html",
-  "icons": {
-  	"16": "images/favicon-16.png",
-  	"32": "images/favicon-32.png",
-  	"114": "images/apple-touch-icon-114.png",
-  	"144": "images/apple-touch-icon-144.png",
-  	"512": "images/fluidicon.png"
-  },
-  "permissions": [
-    "tabs",
-    "https://github.com/login/oauth/access_token",
-    "storage"
-  ],
-  "manifest_version": 2
+   } ],
+   "description": "Github-powered omnibox for chrome!",
+   "homepage_url": "https://github.com/ProLoser/Github-Omnibox",
+   "icons": {
+      "114": "images/apple-touch-icon-114.png",
+      "144": "images/apple-touch-icon-144.png",
+      "16": "images/favicon-16.png",
+      "32": "images/favicon-32.png",
+      "512": "images/fluidicon.png"
+   },
+   "key": "MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCCqYD1qAIpzuhKc5L2u+J4ESnJx5Q1u58zuhOVyT+TChmudCB+jicdGL67zQxGAWUr/GjZh9kE1FVJ3ua0vsYVN+kEU3efFLU9JwqeqJdzSXsNxpzm3SuIOXThR62RM2yNLQte25LOrSSdwqt2I5snp4W7lDIF9tEgLcYjwAueWQIDAQAB",
+   "manifest_version": 2,
+   "name": "Github Omnibox",
+   "omnibox": {
+      "keyword": "gh"
+   },
+   "options_page": "help.html",
+   "permissions": [ "tabs", "https://github.com/login/oauth/access_token", "storage" ],
+   "short_name": "Github Omni",
+   "update_url": "https://clients2.google.com/service/update2/crx",
+   "version": "1.5.1",
+   "web_accessible_resources": [ "oauth2/oauth2.html", "help.html" ]
 }

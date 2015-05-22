@@ -87,7 +87,7 @@ var menu = [
     },
     {
         name: 'Travis CI',
-        icon: 'https://travis-ci.org/favicon.ico',
+        icon: 'https://travis-ci-org.global.ssl.fastly.net/images/favicon-04004642a94f6c2b0d4a567fb5dbe145.png',
         badge: 'https://api.travis-ci.org/:owner/:repo.svg',
         url: 'https://travis-ci.org/:owner/:repo'
     },

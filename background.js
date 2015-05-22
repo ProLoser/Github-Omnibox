@@ -255,7 +255,3 @@ chrome.omnibox.onInputStarted.addListener(omni.setup.bind(omni));
 chrome.omnibox.onInputEntered.addListener(function (text) {
     if (text) omni.decide(text);
 });
-
-// For use in Decorations
-localStorage['http://travis-ci.org/{owner}/{repo}'] = 'https://secure.travis-ci.org/{owner}/{repo}.png';
-localStorage['https://david-dm.org/{owner}/{repo}'] = 'https://david-dm.org/{owner}/{repo}.png';
