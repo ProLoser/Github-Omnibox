@@ -1,13 +1,9 @@
 // TODO This isn't working
-$(window).on('popstate', function(){
-  debugger;
-  if ($('.file-header').length && !$('.omnibox-collapse').length) {
-    load();
-  }
-});
-
+$(window).on('popstate pjax:success', load);
 
 function load() {
+  if (!$('.file-header').length || $('.omnibox-collapse').length)
+    return;
 
   var $toggler = $('<a class="octicon-btn tooltipped tooltipped-nw omnibox-collapse" href="#expand-collapse" aria-label="Expand / Collapse"> \
     <span class="octicon octicon-unfold"></span> \

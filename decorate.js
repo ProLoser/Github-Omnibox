@@ -1,8 +1,9 @@
 function Decorator() {
-    var mainRepoLink = document.querySelector('.js-current-repository');
-    var tokens = mainRepoLink && mainRepoLink.href.split('/').slice(-2);
-    this.owner = tokens[0];
-    this.repo = tokens[1];
+    // <span class="author"><a href="/proloser" class="url fn" itemprop="url" rel="author"><span itemprop="title">proloser</span></a></span>
+    var author = document.querySelector('.author');
+    this.owner = author.textContent;
+    // <strong><a href="/proloser/github-omnibox" data-pjax="#js-repo-pjax-container">github-omnibox</a></strong>
+    this.repo = author.nextElementSibling.nextElementSibling.textContent;
 
 }
 Decorator.prototype.owner = '';
