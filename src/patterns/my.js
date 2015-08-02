@@ -17,10 +17,10 @@
                     { content: 'my activities', description: '<dim>my</dim> <url>activities</url>'},
                     { content: 'my reset', description: '<dim>github omnibox</dim> <url>reset cache</url>' }
                 ];
-                if (localStorage.setup === 'false')
-                    suggestions.push({ content: 'my auth', description: '<dim>github omnibox</dim> <url>authorize with github</url>' });
-                if (localStorage.setup === 'true')
+                if (omni.authorized)
                     suggestions.push({ content: 'my unauth', description: '<dim>github omnibox</dim> <url>unauthorize from github</url>' });
+                else
+                    suggestions.push({ content: 'my auth', description: '<dim>github omnibox</dim> <url>authorize with github</url>' });
                 return suggestions;
             },
             children: {
@@ -88,7 +88,7 @@
                     suggest: suggestOwnRoad,
                     decide: function () {
                         omni.reset();
-                        alert('Cache has been reset'); // TODO reset or clear?
+                        alert('Cache has been cleared'); // TODO reset or clear?
                         return false;
                     }
                 },

@@ -1,207 +1,239 @@
 <!DOCTYPE html>
 <html>
-    <head>
-        <title>Github-Omnibox help page</title>
-        <script src="lib/angular.min.js" ng-csp></script>
-        <script src="help.js"></script>
-        <link rel="stylesheet" href="lib/bootstrap.min.css" />
-        <link rel="stylesheet" href="lib/octicons/octicons.css" />
-        <style>
-        .ng-hide {
-            display: none;
-        }
-        .render .octicon, .render .octicon img {
-            -webkit-filter: grayscale(100%);
-            opacity: 0.6;
-            height: 16px;
-            width: 16px;
-            margin-right: 4px;
-            margin-bottom: 1px;
-            transition: all 0.5s ease;
-            -webkit-transition: all 0.5s ease;
-            -webkit-backface-visibility: hidden;
-        }
-        a.render:hover .octicon, a.render:hover .octicon img {
-            opacity: 1;
-        }
-        </style>
-    </head>
-    <body ng-app="Help" ng-controller="Options" class="container">
-        
-        <h1>Menu Items <span style="color:green" ng-show="saved">SAVED!</span></h1>
-        <form class="well">
-            <p>You can use <code>:owner</code> and <code>:repo</code> tokens.</p>
-            <p>Icon and badge URLs must be <code>https</code>.</p>
-            <p>Badges that don't load will be hidden.</p>
+<head>
+  <title>Github-Omnibox help page</title>
+  <script src="lib/angular.min.js" ng-csp></script>
+  <script src="help.js"></script>
+  <link rel="stylesheet" href="lib/bootstrap.min.css" />
+  <link rel="stylesheet" href="lib/octicons/octicons.css" />
+  <style>
+  .ng-hide {
+      display: none;
+  }
+  .render .octicon, .render .octicon img {
+      -webkit-filter: grayscale(100%);
+      opacity: 0.6;
+      height: 16px;
+      width: 16px;
+      margin-right: 4px;
+      margin-bottom: 1px;
+      transition: all 0.5s ease;
+      -webkit-transition: all 0.5s ease;
+      -webkit-backface-visibility: hidden;
+  }
+  a.render:hover .octicon, a.render:hover .octicon img {
+      opacity: 1;
+  }
+  </style>
+</head>
+<body ng-app="Help" ng-controller="Options" class="container">
 
-            <div class="row">
-                <p class="form-group col-sm-6">
-                    <label class="control-label">
-                        Name
-                    </label>
-                    <input class="form-control" ng-model="formItem.name" placeholder="Example">
-                </p>
-                <p class="form-group col-sm-6">
-                    <label class="control-label">
-                        URL (when menu item is clicked)
-                    </label>
-                    <input class="form-control" ng-model="formItem.url" placeholder="http://example.com/:owner/:repo">
-                </p>
-            </div>
-            <div class="row">
-                <p class="form-group col-sm-6">
-                    <label class="control-label">
-                        Icon (URL or <a target="_blank" href="https://octicons.github.com/">octicon</a> name)
-                    </label>
-                    <input class="form-control" ng-model="formItem.icon" placeholder="https://example.com/favicon.ico or dashboard">
-                </p>
-                <p class="form-group col-sm-6">
-                    <label class="control-label">
-                        Badge (name will be used if left empty)
-                    </label>
-                    <input class="form-control" ng-model="formItem.badge"
-                     placeholder="https://badges.example.com/:owner/:repo.svg">
-                </p>
-            </div>
-            <p class="form-group">
-                <span class="btn-group pull-right">
-                    <button class="btn btn-default" ng-click="reset()">Cancel</button>
-                    <button class="btn btn-primary" ng-click="save()">{{editingIndex&&'Update Existing'||'Save New'}} Menu Item</button>
-                </span>
-            
-                <strong>Preview: </strong>
-                <span>
-                    <a target="_blank" class="render" ng-href="{{formItem.url | test : test.owner : test.repo}}">
-                        <i class="octicon octicon-{{formItem.icon}}">
-                            <img ng-if="formItem.icon.indexOf('https:') == 0" ng-src="{{formItem.icon | test : test.owner : test.repo}}" />
-                        </i>
-                        <img ng-if="formItem.badge" ng-src="{{formItem.badge | test : test.owner : test.repo}}" />
-                        {{formItem.name | test : test.owner : test.repo}}
-                    </a>
-                </span>
-            </p>
-        </form>
-        <p class="input-group">
-            <label class="input-group-addon">
-                <span class="octicon octicon-repo text-muted"></span>
-                Test Repo:
-            </label>
-            <input class="form-control" ng-model="test.owner" placeholder="Owner">
-            <span class="input-group-addon">/</span>
-            <input class="form-control" ng-model="test.repo" placeholder="Repo">
-        </p>
-        <ul class="list-group">
-            <li ng-repeat="item in items track by $index" class="list-group-item">
-                    <div class="pull-right media-right">
-                        <span class="btn-group">
-                            <button class="btn btn-default btn-xs" ng-click="up($index)" ng-disabled="$first"><i class="octicon octicon-arrow-up"></i></button>
-                            <button class="btn btn-default btn-xs" ng-click="remove($index)"><i class="octicon octicon-trashcan"></i></button>
-                            <button class="btn btn-default btn-xs" ng-click="edit($index)"><i class="octicon octicon-pencil"></i></button>
-                            <button class="btn btn-default btn-xs" ng-disabled="$last" ng-click="down($index)"><i class="octicon octicon-arrow-down"></i></button>
-                        </span>
-                    </div>
-                        <a target="_blank" class="render" ng-href="{{item.url | test : test.owner : test.repo}}">
-                            <i class="octicon octicon-{{item.icon}}">
-                                <img ng-if="item.icon.indexOf('https:') == 0" ng-src="{{item.icon | test : test.owner : test.repo}}" />
-                            </i>
-                            <img ng-if="item.badge" ng-src="{{item.badge | test : test.owner : test.repo}}" />
-                            {{item.name | test : test.owner : test.repo}}</a>
-            </li>
-        </ul>
+  <h1>Github Omnibox</h1>
+  <p>
+    <a class="btn btn-default" ng-click="login()"><i class="octicon octicon-mark-github"></i> Github Login</a>
+    <a class="btn btn-default" ng-click="logout()"><i class="octicon octicon-mark-github"></i> Github Logout</a>
+    <a class="btn btn-default" ng-click="resetCache()">Reset Cache</a>
+  </p>
 
-<h1>Omnibox Commands</h1>
-<pre>
-my auth
-my unauth
-my reset
+  <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
+    <div class="panel panel-default">
+      <div class="panel-heading" role="tab" id="headingOne">
+        <h1 ng-click="menuItems=!menuItems" class="panel-title">
+          <i class="pull-right octicon octicon-chevron-{{menuItems?'up':'down'}}"></i>
+          Side Menu Items
+          <span style="color:green" ng-show="saved">SAVED!</span>
+        </h1>
+      </div>
+      <div class="panel-collapse collapse " ng-class="{in:menuItems}">
+        <div class="panel-body">
 
-my issues
-my dash
-my pulls
-my stars
-my starred
-my settings
-my followers
-my following
-my repositories
-my activities
+          <form class="well">
+              <p>You can use <code>:owner</code> and <code>:repo</code> tokens.</p>
+              <p>Icon and badge URLs must be <code>https</code>.</p>
+              <p>Badges that don't load will be hidden.</p>
 
-new
-new issue
-new repo
+              <div class="row">
+                  <p class="form-group col-sm-6">
+                      <label class="control-label">
+                          Name
+                      </label>
+                      <input class="form-control" ng-model="formItem.name" placeholder="Example">
+                  </p>
+                  <p class="form-group col-sm-6">
+                      <label class="control-label">
+                          URL (when menu item is clicked)
+                      </label>
+                      <input class="form-control" ng-model="formItem.url" placeholder="http://example.com/:owner/:repo">
+                  </p>
+              </div>
+              <div class="row">
+                  <p class="form-group col-sm-6">
+                      <label class="control-label">
+                          Icon (URL or <a target="_blank" href="https://octicons.github.com/">octicon</a> name)
+                      </label>
+                      <input class="form-control" ng-model="formItem.icon" placeholder="https://example.com/favicon.ico or dashboard">
+                  </p>
+                  <p class="form-group col-sm-6">
+                      <label class="control-label">
+                          Badge (name will be used if left empty)
+                      </label>
+                      <input class="form-control" ng-model="formItem.badge"
+                       placeholder="https://badges.example.com/:owner/:repo.svg">
+                  </p>
+              </div>
+              <p class="form-group">
+                  <span class="btn-group pull-right">
+                      <button class="btn btn-default" ng-click="reset()">Cancel</button>
+                      <button class="btn btn-primary" ng-click="save()">{{editingIndex&&'Update Existing'||'Save New'}} Menu Item</button>
+                  </span>
 
-user/repo
-user/repo io
-user/repo pages
-user/repo pulls
-user/repo network
-user/repo pulse
-user/repo settings
-user/repo issues
-user/repo contributors
-user/repo compare
-user/repo wiki
-user/repo graphs
-user/repo #issue
-user/repo new issue
-user/repo new pull
-user/repo clone
-user/repo travis
-user/repo @branch /path
-user/repo @branch
-user/repo /path
+                  <strong>Preview: </strong>
+                  <span>
+                      <a target="_blank" class="render" ng-href="{{formItem.url | test : test.owner : test.repo}}">
+                          <i class="octicon octicon-{{formItem.icon}}">
+                              <img ng-if="formItem.icon.indexOf('https:') == 0" ng-src="{{formItem.icon | test : test.owner : test.repo}}" />
+                          </i>
+                          <img ng-if="formItem.badge" ng-src="{{formItem.badge | test : test.owner : test.repo}}" />
+                          {{formItem.name | test : test.owner : test.repo}}
+                      </a>
+                  </span>
+              </p>
+          </form>
+          <p class="input-group">
+              <label class="input-group-addon">
+                  <span class="octicon octicon-repo text-muted"></span>
+                  Test Repo:
+              </label>
+              <input class="form-control" ng-model="test.owner" placeholder="Owner">
+              <span class="input-group-addon">/</span>
+              <input class="form-control" ng-model="test.repo" placeholder="Repo">
+          </p>
+          <ul class="list-group">
+              <li ng-repeat="item in items track by $index" class="list-group-item">
+                      <div class="pull-right media-right">
+                          <span class="btn-group">
+                              <button class="btn btn-default btn-xs" ng-click="up($index)" ng-disabled="$first"><i class="octicon octicon-arrow-up"></i></button>
+                              <button class="btn btn-default btn-xs" ng-click="remove($index)"><i class="octicon octicon-trashcan"></i></button>
+                              <button class="btn btn-default btn-xs" ng-click="edit($index)"><i class="octicon octicon-pencil"></i></button>
+                              <button class="btn btn-default btn-xs" ng-disabled="$last" ng-click="down($index)"><i class="octicon octicon-arrow-down"></i></button>
+                          </span>
+                      </div>
+                          <a target="_blank" class="render" ng-href="{{item.url | test : test.owner : test.repo}}">
+                              <i class="octicon octicon-{{item.icon}}">
+                                  <img ng-if="item.icon.indexOf('https:') == 0" ng-src="{{item.icon | test : test.owner : test.repo}}" />
+                              </i>
+                              <img ng-if="item.badge" ng-src="{{item.badge | test : test.owner : test.repo}}" />
+                              {{item.name | test : test.owner : test.repo}}</a>
+              </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <div class="panel panel-default">
+      <div class="panel-heading" role="tab" id="headingOne">
+        <h1 ng-click="commands=!commands" class="panel-title">
+          <i class="pull-right octicon octicon-chevron-{{commands?'up':'down'}}"></i>
+          Omnibox Commands List
+        </h1>
+      </div>
+      <div class="panel-collapse collapse " ng-class="{in:commands}">
+        <div class="panel-body">
+          <pre>
+          my auth
+          my unauth
+          my reset
 
-/repo
-/repo io
-/repo pages
-/repo pulls
-/repo network
-/repo pulse
-/repo settings
-/repo issues
-/repo contributors
-/repo compare
-/repo wiki
-/repo graphs
-/repo #issue
-/repo new issue
-/repo new pull
-/repo clone
-/repo travis
-/repo @branch /path
-/repo @branch
-/repo /path
+          my issues
+          my dash
+          my pulls
+          my stars
+          my starred
+          my settings
+          my followers
+          my following
+          my repositories
+          my activities
 
-!io
-!pages
-!pulls
-!network
-!pulse
-!settings
-!issues
-!contributors
-!compare
-!wiki
-!graphs
-!#issue
-!new issue
-!new pull
-!clone
-!travis
-!@branch
-!@branch /path
-!/path
+          new
+          new issue
+          new repo
 
-@user/
-@user/ followers
-@user/ following
-@user/ starred
-@user/ repositories
-@user/ activities
+          user/repo
+          user/repo io
+          user/repo pages
+          user/repo pulls
+          user/repo network
+          user/repo pulse
+          user/repo settings
+          user/repo issues
+          user/repo contributors
+          user/repo compare
+          user/repo wiki
+          user/repo graphs
+          user/repo #issue
+          user/repo new issue
+          user/repo new pull
+          user/repo clone
+          user/repo travis
+          user/repo @branch /path
+          user/repo @branch
+          user/repo /path
 
-gist
-gist id
-gist user
-gist user/id</pre>
-    </body>
+          /repo
+          /repo io
+          /repo pages
+          /repo pulls
+          /repo network
+          /repo pulse
+          /repo settings
+          /repo issues
+          /repo contributors
+          /repo compare
+          /repo wiki
+          /repo graphs
+          /repo #issue
+          /repo new issue
+          /repo new pull
+          /repo clone
+          /repo travis
+          /repo @branch /path
+          /repo @branch
+          /repo /path
+
+          !io
+          !pages
+          !pulls
+          !network
+          !pulse
+          !settings
+          !issues
+          !contributors
+          !compare
+          !wiki
+          !graphs
+          !#issue
+          !new issue
+          !new pull
+          !clone
+          !travis
+          !@branch
+          !@branch /path
+          !/path
+
+          @user/
+          @user/ followers
+          @user/ following
+          @user/ starred
+          @user/ repositories
+          @user/ activities
+
+          gist
+          gist id
+          gist user
+          gist user/id</pre>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
 </html>

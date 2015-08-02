@@ -49,7 +49,7 @@ var menu = [
         url: chrome.extension.getURL('help.html')
     }
 ];
-module.controller('Options', function($scope, $timeout) {
+module.controller('Options', function($scope, $timeout, $q) {
     chrome.storage.sync.get({menu:menu}, function(data){
         $scope.items = data.menu;
         $scope.$apply();
@@ -59,13 +59,14 @@ module.controller('Options', function($scope, $timeout) {
         repo: 'angular'
     };
 
+    var timer = $q.when();
     save = function(){
         $scope.saving = true;
         chrome.storage.sync.set({menu:$scope.items}, function(){
-            console.log('saved');
             $scope.saving = false;
             $scope.saved = true;
-            $timeout(function(){
+            $timeout.cancel(timer);
+            timer = $timeout(function(){
                 $scope.saved = false;
             }, 2000);
             $scope.$apply();
@@ -89,7 +90,7 @@ module.controller('Options', function($scope, $timeout) {
         $scope.formItem = {};
     };
     $scope.reset();
-    
+
     $scope.remove = function(index) {
         if (confirm('Are you sure?')) {
             $scope.items.splice(index, 1);
@@ -104,6 +105,15 @@ module.controller('Options', function($scope, $timeout) {
         $scope.items.splice(index+1, 0, $scope.items.splice(index,1)[0]);
         save();
     };
+    $scope.resetCache = function() {
+        chrome.runtime.sendMessage(null, 'reset');
+    };
+    $scope.login = function() {
+      chrome.runtime.sendMessage(null, 'login');
+    };
+    $scope.logout = function() {
+      chrome.runtime.sendMessage(null, 'logout');
+    }
 });
 
 module.filter('test', function(){

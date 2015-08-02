@@ -2,7 +2,7 @@
   "name": "Github Omnibox",
   "short_name": "Github Omni",
   "description": "Github-powered omnibox for chrome!",
-  "version": "1.6.1",
+  "version": "1.6.2",
   "manifest_version": 2,
   "homepage_url": "https://github.com/ProLoser/Github-Omnibox",
   "options_page": "help.html",
@@ -32,6 +32,7 @@
       "src/patterns/repoActions.js",
       "src/patterns/userActions.js",
       "src/patterns/gist.js",
+      "src/Omni.js",
       "background.js"
     ]
   },
