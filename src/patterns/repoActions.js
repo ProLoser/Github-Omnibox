@@ -304,6 +304,9 @@
                 });
                 if (repo)
                     return repo.full_name;
+
+                // If no match found, go to `yourName/yourQuery`
+                return omni.user + '/' + repoName;
             },
 
             children: repoActions
@@ -323,9 +326,36 @@
                 });
                 if (repo)
                     return repo.full_name;
+                else
+                    return omni.urls.search + args[0].substr(1);
             },
 
             children: repoActions
+        },
+        "~history": {
+            pattern: /^\~[\-\w\.]*/,
+            suggest: function (args) {
+                var defer = Defer(),
+                  repoName = args[0].substring(1).toLowerCase(), myRepos;
+                if (!repoName)
+                  return;
+                chrome.history.search({ text: 'https://github.com/ ' + repoName }, function(results) {
+                  var historySuggestions = [];
+                  var found = {};
+                  results = results.forEach(function(result){
+                    var url = result.url.match(/https:\/\/github\.com\/(\w+\/\w+)/i);
+                    if (url[1] && !found[url[1]]) {
+                      found[url[1]] = true;
+                      historySuggestions.push({ content: url[1], description: result.title });
+                    };
+                  });
+                  defer.resolve(historySuggestions);
+                });
+                return [{ description: 'Searching Browsing History...', content: '' }, defer];
+            },
+            decide: function (args) {
+              return omni.urls.search + args[0].substr(1);
+            }
         }
     });
 
