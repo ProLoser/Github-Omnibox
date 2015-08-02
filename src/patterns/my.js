@@ -72,7 +72,15 @@
                     suggest: suggestOwnRoad,
                     decide: function () {
                         omni.authorize();
-                        alert("You can unauthorize at any time by doing \"gh my unauth\"");
+                        alert('You can unauthorize at any time by doing "gh my unauth"');
+                        return false;
+                    }
+                },
+                login: {
+                    suggest: suggestOwnRoad,
+                    decide: function () {
+                        omni.authorize();
+                        alert('You can unauthorize at any time by doing "gh my logout"');
                         return false;
                     }
                 },
@@ -84,11 +92,19 @@
                         return false;
                     }
                 },
+                logout: {
+                    suggest: suggestOwnRoad,
+                    decide: function () {
+                        omni.unauthorize();
+                        alert('You can authorize at any time by doing "gh my login"');
+                        return false;
+                    }
+                },
                 reset: {
                     suggest: suggestOwnRoad,
                     decide: function () {
                         omni.reset();
-                        alert('Cache has been cleared'); // TODO reset or clear?
+                        alert('Cache has been cleared');
                         return false;
                     }
                 },
