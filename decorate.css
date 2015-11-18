@@ -4,6 +4,10 @@
     line-height: 1;
 }
 
+.github-omnibox-sidebar-item {
+    float: left;
+}
+
 .github-omnibox-sidebar-item .octicon img {
     -webkit-filter: grayscale(100%);
     filter: grayscale(100%);
@@ -15,6 +19,11 @@
     -webkit-transition: all ease 0.5s;
     transition: all ease 0.5s;
 	-webkit-backface-visibility: hidden; /* Prevents blurring */
+}
+
+.github-omnibox-sidebar-item .sunken-menu-item:focus,
+.github-omnibox-sidebar-item .sunken-menu-item:hover {
+    box-shadow: none;
 }
 
 .github-omnibox-sidebar-item:hover .octicon img {
