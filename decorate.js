@@ -29,7 +29,7 @@ Decorator.prototype.row = function(data) {
     else
         icon = '<span class="octicon octicon-' + data.icon +'"></span>';
 
-    var tmpl = '<li class="github-omnibox-sidebar-item tooltipped tooltipped-w" aria-label="'+data.name+'"> \
+    var tmpl = '<li class="github-omnibox-sidebar-item" aria-label="'+data.name+'"> \
         <a href="'+data.url+'" class="sunken-menu-item">'+icon+' \
             <span class="full-word">'+ (data.badge && this.img(data.badge, data.name) || data.name) +'</span> \
         </a> \
@@ -38,13 +38,11 @@ Decorator.prototype.row = function(data) {
 };
 
 Decorator.prototype.addMenu = function(items) {
-    var target = document.querySelector('.sunken-menu');
+    var target = document.querySelector('.repository-meta');
     if (!target) return;
-    var element = document.createElement('div');
-    element.className = 'sunken-menu-separator';
-    target.appendChild(element);
     element = document.createElement('ul');
     element.className = 'sunken-menu-group omnibox-menu';
+    target.appendChild(element);
     element.innerHTML = items.map(this.row, this).join('');
 
     [].forEach.call(element.querySelectorAll('img'), function(el){
