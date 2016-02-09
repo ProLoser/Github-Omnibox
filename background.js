@@ -1,4 +1,4 @@
-var omni = new Omni(localStorage.setup === 'true');
+var omni = new Omni(localStorage.getItem('setup') === 'true');
 
 chrome.runtime.onMessage.addListener(function (message) {
     switch (message) {
@@ -27,7 +27,7 @@ chrome.runtime.onMessage.addListener(function (message) {
 chrome.omnibox.onInputChanged.addListener(omni.suggest.bind(omni));
 
 chrome.omnibox.onInputStarted.addListener(function () {
-    if (_.isUndefined(localStorage.setup)) {
+    if (_.isUndefined(localStorage.getItem('setup'))) {
         if (confirm('Would you like to Authorize Github-Omnibox for personalized suggestions?')) {
             omni.authorize();
             localStorage.setup = true;
