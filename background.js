@@ -30,9 +30,11 @@ chrome.omnibox.onInputStarted.addListener(function () {
     if (_.isUndefined(localStorage.setup)) {
         if (confirm('Would you like to Authorize Github-Omnibox for personalized suggestions?')) {
             omni.authorize();
+            localStorage.setup = true;
             alert('You can unauthorize at any time by doing "gh my unauth"');
         } else {
             omni.unauthorize();
+            localStorage.setup = false;
         }
     }
 });
