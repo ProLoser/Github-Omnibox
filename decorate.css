@@ -4,30 +4,25 @@
     line-height: 1;
 }
 
-.github-omnibox-sidebar-item {
-    float: left;
+/* DROPDOWN */
+.reponav .select-menu {
+  margin-bottom: -5px;
+  display: inline-block;
+}
+.reponav .select-menu-modal-holder {
+  top: 100%;
+  right: 0;
+}
+.reponav .select-menu-modal {
+  width: auto;
 }
 
-.github-omnibox-sidebar-item .octicon img {
-    -webkit-filter: grayscale(100%);
-    filter: grayscale(100%);
-    opacity: 0.6;
+/* DROPDOWN ITEMS */
+.reponav .select-menu-item-icon {
     height: 16px;
     width: 16px;
-    margin-right: 4px;
-    margin-bottom: 1px;
-    -webkit-transition: all ease 0.5s;
-    transition: all ease 0.5s;
-	-webkit-backface-visibility: hidden; /* Prevents blurring */
+    margin-top: 2px;
 }
-
-.github-omnibox-sidebar-item .sunken-menu-item:focus,
-.github-omnibox-sidebar-item .sunken-menu-item:hover {
-    box-shadow: none;
-}
-
-.github-omnibox-sidebar-item:hover .octicon img {
-	opacity: 1;
-	-webkit-filter: grayscale(0%);
-	filter: grayscale(0%);
+.reponav .select-menu-item-heading {
+  line-height: 0;
 }

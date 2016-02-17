@@ -3,32 +3,26 @@ var module = angular.module('Help',[]);
 var menu = [
     {
         name: 'Gitter Chat',
-        icon: 'https://cdn01.gitter.im/_s/1b5c955/images/favicon5.png',
-        badge: 'https://badges.gitter.im/:owner/:repo.png',
+        icon: 'https://gitter.im/favicon.ico',
+        badge: 'https://img.shields.io/gitter/room/:owner/:repo.svg',
         url: 'https://gitter.im/:owner/:repo'
     },
     {
         name: 'Travis CI',
-        icon: 'https://travis-ci.org/favicon.ico',
-        badge: 'https://api.travis-ci.org/:owner/:repo.svg',
+        icon: 'https://cdn.travis-ci.org/images/favicon.png',
+        badge: 'https://img.shields.io/travis/:owner/:repo.svg',
         url: 'https://travis-ci.org/:owner/:repo'
-    },
-    {
-        name: 'Gemnasium',
-        icon: 'https://assets.gemnasium.com/assets/favicon.png',
-        badge: 'https://david-dm.org/:owner/:repo.svg',
-        url: 'https://david-dm.org/:owner/:repo'
     },
     {
         name: 'David DM',
         icon: 'https://david-dm.org/favicon.ico',
-        badge: 'https://david-dm.org/:owner/:repo.svg',
+        badge: 'https://img.shields.io/david/:owner/:repo.svg',
         url: 'https://david-dm.org/:owner/:repo'
     },
     {
         name: 'David DM Dev',
         icon: 'https://david-dm.org/favicon.ico',
-        badge: 'https://david-dm.org/:owner/:repo/dev-status.svg',
+        badge: 'https://img.shields.io/david/dev/:owner/:repo.svg',
         url: 'https://david-dm.org/:owner/:repo#info=devDependencies'
     },
     {
@@ -40,13 +34,8 @@ var menu = [
     {
         name: 'Code Climate',
         icon: 'https://codeclimate.com/favicon.ico',
-        badge: 'https://codeclimate.com/github/:owner/:repo.svg',
+        badge: 'https://img.shields.io/codeclimate/github/:owner/:repo.svg',
         url: 'https://codeclimate.com/github/:owner/:repo'
-    },
-    {
-        name: 'Github Omnibox',
-        icon: 'tools',
-        url: chrome.extension.getURL('help.html')
     }
 ];
 module.controller('Options', function($scope, $timeout, $q) {
@@ -72,8 +61,9 @@ module.controller('Options', function($scope, $timeout, $q) {
             $scope.$apply();
         });
     };
+    $scope.isNumber = angular.isNumber;
     $scope.save = function(){
-        if ($scope.editingIndex)
+        if (angular.isNumber($scope.editingIndex))
             $scope.items[$scope.editingIndex] = $scope.formItem;
         else
             $scope.items.push($scope.formItem);

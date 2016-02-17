@@ -40,7 +40,7 @@
       <div class="panel-heading" role="tab" id="headingOne">
         <h1 ng-click="menuItems=!menuItems" class="panel-title">
           <i class="pull-right octicon octicon-chevron-{{menuItems?'up':'down'}}"></i>
-          Side Menu Items
+          Status Badges
           <span style="color:green" ng-show="saved">SAVED!</span>
         </h1>
       </div>
@@ -48,6 +48,7 @@
         <div class="panel-body">
 
           <form class="well">
+              <a class="btn btn-default pull-right btn-xs" href="http://shields.io/">Discover New Badges!</a>
               <p>You can use <code>:owner</code> and <code>:repo</code> tokens.</p>
               <p>Icon and badge URLs must be <code>https</code>.</p>
               <p>Badges that don't load will be hidden.</p>
@@ -69,9 +70,9 @@
               <div class="row">
                   <p class="form-group col-sm-6">
                       <label class="control-label">
-                          Icon (URL or <a target="_blank" href="https://octicons.github.com/">octicon</a> name)
+                          Icon (URL)
                       </label>
-                      <input class="form-control" ng-model="formItem.icon" placeholder="https://example.com/favicon.ico or dashboard">
+                      <input class="form-control" ng-model="formItem.icon" placeholder="https://example.com/favicon.ico">
                   </p>
                   <p class="form-group col-sm-6">
                       <label class="control-label">
@@ -84,7 +85,7 @@
               <p class="form-group">
                   <span class="btn-group pull-right">
                       <button class="btn btn-default" ng-click="reset()">Cancel</button>
-                      <button class="btn btn-primary" ng-click="save()">{{editingIndex&&'Update Existing'||'Save New'}} Menu Item</button>
+                      <button class="btn btn-primary" ng-click="save()">{{isNumber(editingIndex)&&'Update Existing'||'Save New'}} Menu Item</button>
                   </span>
 
                   <strong>Preview: </strong>
