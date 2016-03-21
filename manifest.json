@@ -2,7 +2,7 @@
   "name": "Omnibox for Github",
   "short_name": "Github Omni",
   "description": "Github-powered omnibox for chrome!",
-  "version": "1.8.0",
+  "version": "1.8.1",
   "manifest_version": 2,
   "homepage_url": "https://github.com/ProLoser/Github-Omnibox",
   "options_page": "help.html",
