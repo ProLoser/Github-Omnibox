@@ -340,22 +340,58 @@
                 if (!repoName)
                   return;
                 chrome.history.search({ text: 'https://github.com/ ' + repoName }, function(results) {
-                  var historySuggestions = [];
+                  var suggestions = [];
                   var found = {};
                   results = results.forEach(function(result){
                     var url = result.url.match(/https:\/\/github\.com\/(\w+\/\w+)/i);
-                    if (url[1] && !found[url[1]]) {
+                    if (url && url[1] && !found[url[1]]) {
                       found[url[1]] = true;
-                      historySuggestions.push({ content: url[1], description: result.title });
+                      suggestions.push({ content: url[1], description: result.title });
                     };
                   });
-                  defer.resolve(historySuggestions);
+                  defer.resolve(suggestions);
                 });
                 return [{ description: 'Searching Browsing History...', content: '' }, defer];
             },
             decide: function (args) {
               return omni.urls.search + args[0].substr(1);
             }
+        },
+        "atomic": {
+          pattern: /\S*/,
+          suggest: function(args) {
+              var repoName = args[0].toLowerCase(),
+                myRepos = [{content:'', description: 'Searching Repos...'}];
+
+              // OWNED
+              myRepos = myRepos.concat(filterRepos(omni.caches.my.repos, repoName, true));
+              // STARRED
+              myRepos = myRepos.concat(filterRepos(omni.caches.starred, repoName, true));
+
+              // HISTORY
+              if (repoName) {
+                var defer = Defer();
+                chrome.history.search({ text: 'https://github.com/ ' + repoName }, function(results) {
+                  var suggestions = [];
+                  var found = {};
+                  results = results.forEach(function(result){
+                    var url = result.url.match(/https:\/\/github\.com\/(\w+\/\w+)/i);
+                    if (url && url[1] && !found[url[1]]) {
+                      found[url[1]] = true;
+                      suggestions.push({ content: url[1], description: result.title });
+                    };
+                  });
+                  myRepos.pop();
+                  defer.resolve(myRepos.concat(suggestions));
+                });
+                myRepos.push(defer);
+              }
+              // RETURNED
+              return myRepos;
+          },
+          decide: function(args) {
+            return;
+          }
         }
     });
 
