@@ -3,15 +3,18 @@
   "short_name": "Github Omni",
   "description": "Github-powered omnibox for chrome!",
   "version": "1.8.1",
-  "manifest_version": 2,
+  "manifest_version": 3,
   "homepage_url": "https://github.com/ProLoser/Github-Omnibox",
   "options_page": "help.html",
   "omnibox": { "keyword": "gh" },
   "permissions": [
-    "tabs",
-    "https://github.com/login/oauth/access_token",
+    "identity",
     "storage",
     "history"
+  ],
+  "host_permissions": [
+    "https://github.com/",
+    "https://api.github.com/"
   ],
   "icons": {
     "114": "images/apple-touch-icon-114.png",
@@ -21,21 +24,7 @@
     "512": "images/fluidicon.png"
   },
   "background": {
-    "scripts": [
-      "lib/underscore-min.js",
-      "oauth2/oauth2.js",
-      "src/Defer.js",
-      "src/Steps.js",
-      "src/StepsManager.js",
-      "src/patterns/help.js",
-      "src/patterns/my.js",
-      "src/patterns/new.js",
-      "src/patterns/repoActions.js",
-      "src/patterns/userActions.js",
-      "src/patterns/gist.js",
-      "src/Omni.js",
-      "background.js"
-    ]
+    "service_worker": "service-worker.js"
   },
   "content_scripts": [
     {
@@ -56,7 +45,9 @@
     }
   ],
   "web_accessible_resources": [
-    "oauth2/oauth2.html",
-    "help.html"
+    {
+      "resources": ["oauth2/oauth2.html", "help.html"],
+      "matches": ["<all_urls>"]
+    }
   ]
 }
