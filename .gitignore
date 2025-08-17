@@ -1,2 +1,7 @@
 *.zip
 .idea
+
+# Plasmo build artifacts and dependencies
+working-plasmo/node_modules/
+working-plasmo/build/
+working-plasmo/.plasmo/
