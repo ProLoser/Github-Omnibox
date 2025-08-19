@@ -1,0 +1,28 @@
+.sunken-menu-group.omnibox-menu a.sunken-menu-item {
+    margin-bottom: 0;
+    padding: 5px 10px;
+    line-height: 1;
+}
+
+/* DROPDOWN */
+.reponav .select-menu {
+  margin-bottom: -5px;
+  display: inline-block;
+}
+.reponav .select-menu-modal-holder {
+  top: 100%;
+  right: 0;
+}
+.reponav .select-menu-modal {
+  width: auto;
+}
+
+/* DROPDOWN ITEMS */
+.reponav .select-menu-item-icon {
+    height: 16px;
+    width: 16px;
+    margin-top: 2px;
+}
+.reponav .select-menu-item-heading {
+  line-height: 0;
+}

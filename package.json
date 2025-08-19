@@ -1,0 +1,34 @@
+{
+  "name": "github-omnibox",
+  "displayName": "Github Omnibox",
+  "version": "0.0.1",
+  "description": "A basic Plasmo extension.",
+  "author": "Plasmo",
+  "scripts": {
+    "dev": "plasmo dev",
+    "build": "plasmo build",
+    "package": "plasmo package"
+  },
+  "dependencies": {
+    "@primer/octicons-react": "^19.15.5",
+    "bootstrap": "^5.3.7",
+    "jquery": "^3.7.1",
+    "plasmo": "^0.90.5",
+    "react": "18.2.0",
+    "react-bootstrap": "^2.10.10",
+    "react-dom": "18.2.0",
+    "typescript": "5.3.3"
+  },
+  "devDependencies": {
+    "@types/chrome": "0.0.258",
+    "@types/jquery": "^3.5.32",
+    "@types/node": "20.11.5",
+    "@types/react": "18.2.48",
+    "@types/react-dom": "18.2.18"
+  },
+  "manifest": {
+    "host_permissions": [
+      "https://*/*"
+    ]
+  }
+}
