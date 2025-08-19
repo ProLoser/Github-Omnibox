@@ -1,2 +1,12 @@
+# Archives
 *.zip
+
+# IDE files
 .idea
+
+# Node
+node_modules
+
+# Plasmo
+.plasmo
+build

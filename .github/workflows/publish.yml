@@ -1,0 +1,43 @@
+# This workflow is used to publish the extension to the Chrome Web Store.
+# It is triggered when a new tag matching the pattern "v*.*.*" is pushed.
+name: Publish to Chrome Web Store
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+
+jobs:
+  build-and-publish:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+          cache: 'yarn'
+
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+
+      - name: Build and package extension
+        # 'plasmo package' creates the zip file needed for the store
+        run: yarn package
+
+      - name: Upload to Chrome Web Store
+        uses: plasmo/action-chrome-webstore-upload@v2
+        with:
+          # The extension ID, can be found in the Chrome Web Store developer dashboard
+          extension-id: ${{ secrets.CHROME_EXTENSION_ID }}
+          # The client ID and secret, obtained from the Google Cloud Console
+          client-id: ${{ secrets.CHROME_CLIENT_ID }}
+          client-secret: ${{ secrets.CHROME_CLIENT_SECRET }}
+          # The refresh token, obtained by running 'pnpm dlx gcp-refresh-token'
+          refresh-token: ${{ secrets.CHROME_REFRESH_TOKEN }}
+          # The path to the zip file created by 'plasmo package'
+          file-path: build/chrome-mv3-prod.zip
+          # Optional: Use 'draft' to upload as a draft, or 'submit' to publish directly
+          publish-action: 'draft'
