@@ -1,0 +1,22 @@
+{
+  "manifest_version": 3,
+  "name": "GitHub Omnibox",
+  "short_name": "gh",
+  "description": "Navigate GitHub from the address bar using gh CLI commands (no login required)",
+  "version": "2.0.0",
+  "homepage_url": "https://github.com/ProLoser/Github-Omnibox",
+  "omnibox": { "keyword": "gh" },
+  "permissions": ["history", "tabs"],
+  "host_permissions": [
+    "https://api.github.com/*"
+  ],
+  "background": {
+    "service_worker": "background.js",
+    "type": "module"
+  },
+  "icons": {
+    "16":  "images/favicon-16.png",
+    "32":  "images/favicon-32.png",
+    "128": "images/fluidicon.png"
+  }
+}
