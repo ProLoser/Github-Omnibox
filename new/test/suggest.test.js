@@ -13,29 +13,80 @@ function contents(suggestions) {
 
 // ── tests ─────────────────────────────────────────────────────────────────────
 
-describe('Stage 0 – command completion', () => {
-  test('empty input lists all commands', () => {
+describe('Stage 0 – free-type mode (repos surface immediately)', () => {
+  const repos = ['facebook/react', 'microsoft/vscode', 'torvalds/linux'];
+
+  test('empty input with history repos shows repos first, then commands', () => {
+    const result = suggest('', { historyRepos: repos });
+    const c = contents(result);
+    // Repos appear before commands
+    expect(c).toContain('facebook/react');
+    expect(c).toContain('microsoft/vscode');
+    // At least some commands still present
+    expect(c).toContain('repo ');
+    expect(c).toContain('issue ');
+    // Repos come before commands (most-visited repo is index 0)
+    expect(c.indexOf('facebook/react')).toBeLessThan(c.indexOf('repo '));
+    // Total does not exceed omnibox limit
+    expect(result.length).toBeLessThanOrEqual(10);
+  });
+
+  test('empty input with no history shows all commands', () => {
     const result = suggest('');
-    expect(result.length).toBe(COMMANDS.length);
+    const c = contents(result);
     for (const cmd of COMMANDS) {
-      expect(contents(result)).toContain(`${cmd.name} `);
+      expect(c).toContain(`${cmd.name} `);
     }
   });
 
-  test('partial prefix filters commands', () => {
-    const result = suggest('r');
-    expect(contents(result)).toContain('repo ');
-    expect(contents(result)).toContain('run ');
-    expect(contents(result)).not.toContain('issue ');
+  test('partial matching a command shows commands + matching repos', () => {
+    const result = suggest('r', { historyRepos: repos });
+    const c = contents(result);
+    expect(c).toContain('repo ');
+    expect(c).toContain('run ');
+    // Matching repos also shown
+    expect(c).toContain('facebook/react');
+    // Non-matching command not shown
+    expect(c).not.toContain('issue ');
   });
 
-  test('exact command prefix', () => {
+  test('exact command prefix still shows that command', () => {
     const result = suggest('repo');
     expect(contents(result)).toContain('repo ');
   });
 
-  test('no match returns empty', () => {
-    expect(suggest('zzz')).toEqual([]);
+  test('non-command partial shows matching repos from history', () => {
+    const result = suggest('face', { historyRepos: repos });
+    const c = contents(result);
+    expect(c).toContain('facebook/react');
+    expect(c).not.toContain('microsoft/vscode');
+    // No command suggestions when partial matches nothing
+    expect(c).not.toContain('repo ');
+  });
+
+  test('non-command partial with no history offers GitHub search fallback', () => {
+    const result = suggest('zzz');
+    expect(result.length).toBe(1);
+    expect(result[0].content).toBe('search repos zzz');
+    expect(result[0].description).toContain('zzz');
+  });
+
+  test('owner/repo partial shows matching repos', () => {
+    const result = suggest('facebook/', { historyRepos: repos, searchRepos: ['facebook/react'] });
+    const c = contents(result);
+    expect(c).toContain('facebook/react');
+  });
+
+  test('total suggestions do not exceed 10', () => {
+    const reposForLimitTest = Array.from({ length: 8 }, (_, i) => `owner/repo${i}`);
+    const result = suggest('', { historyRepos: reposForLimitTest });
+    expect(result.length).toBeLessThanOrEqual(10);
+  });
+
+  test('repo suggestions have content without command prefix and description with match tag', () => {
+    const result = suggest('face', { historyRepos: ['facebook/react'] });
+    expect(result[0].content).toBe('facebook/react');
+    expect(result[0].description).toContain('<match>facebook/react</match>');
   });
 });
 
@@ -141,7 +192,7 @@ describe('Stage 2 – non-repo arg types', () => {
 
 describe('result shape', () => {
   test('every suggestion has content and description strings', () => {
-    for (const text of ['', 'repo ', 'repo view ', 'issue list ']) {
+    for (const text of ['', 'repo ', 'repo view ', 'issue list ', 'face']) {
       const results = suggest(text, { historyRepos: ['a/b'] });
       for (const s of results) {
         expect(typeof s.content).toBe('string');

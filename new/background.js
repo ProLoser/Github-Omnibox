@@ -15,7 +15,7 @@ import { searchGitHub } from './src/search.js';
 import { resolve } from './src/navigate.js';
 
 chrome.omnibox.setDefaultSuggestion({
-  description: 'GitHub: type a <match>gh</match> command — e.g. <dim>repo view</dim>, <dim>issue list</dim>, <dim>search repos</dim>',
+  description: 'GitHub: type <match>owner/repo</match> to open a repo, or a command — <dim>repo view</dim>, <dim>issue list</dim>, <dim>pr create</dim>',
 });
 
 chrome.omnibox.onInputChanged.addListener(async (text, suggest) => {
