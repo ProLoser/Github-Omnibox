@@ -6,7 +6,15 @@
   "version": "2.0.0",
   "homepage_url": "https://github.com/ProLoser/Github-Omnibox",
   "omnibox": { "keyword": "gh" },
-  "permissions": ["history", "tabs"],
+  "action": {
+    "default_icon": {
+      "16":  "images/favicon-16.png",
+      "32":  "images/favicon-32.png",
+      "128": "images/fluidicon.png"
+    },
+    "default_title": "GitHub Omnibox"
+  },
+  "permissions": ["history", "tabs", "contextMenus", "storage"],
   "host_permissions": [
     "https://api.github.com/*"
   ],

@@ -1,4 +1,4 @@
-import { COMMANDS, findCommand, findSubcommand, buildUrl } from '../src/commands.js';
+import { COMMANDS, makeCommands, findCommand, findSubcommand, buildUrl } from '../src/commands.js';
 
 describe('COMMANDS', () => {
   test('exports a non-empty array', () => {
@@ -134,5 +134,55 @@ describe('buildUrl', () => {
   test('returns null for unknown command/subcommand', () => {
     expect(buildUrl('nope', 'view', [])).toBeNull();
     expect(buildUrl('repo', 'nope', [])).toBeNull();
+  });
+});
+
+describe('makeCommands – GitHub Enterprise', () => {
+  const GHE = 'https://github.myco.com';
+  const cmds = makeCommands(GHE);
+
+  function gheUrl(cmdName, subcmdName, args = []) {
+    const cmd = cmds.find(c => c.name === cmdName);
+    const sub = cmd?.subcommands.find(s => s.name === subcmdName);
+    return sub ? sub.url(args) : null;
+  }
+
+  test('makeCommands returns same structure as COMMANDS', () => {
+    expect(cmds.length).toBe(COMMANDS.length);
+    for (let i = 0; i < COMMANDS.length; i++) {
+      expect(cmds[i].name).toBe(COMMANDS[i].name);
+      expect(cmds[i].subcommands.length).toBe(COMMANDS[i].subcommands.length);
+    }
+  });
+
+  test('repo view uses GHE base', () => {
+    expect(gheUrl('repo', 'view', ['myorg/myrepo'])).toBe(`${GHE}/myorg/myrepo`);
+  });
+
+  test('repo create uses GHE base', () => {
+    expect(gheUrl('repo', 'create')).toBe(`${GHE}/new`);
+  });
+
+  test('issue list uses GHE base', () => {
+    expect(gheUrl('issue', 'list', ['myorg/myrepo'])).toBe(`${GHE}/myorg/myrepo/issues`);
+  });
+
+  test('pr view uses GHE base', () => {
+    expect(gheUrl('pr', 'view', ['myorg/myrepo', '7'])).toBe(`${GHE}/myorg/myrepo/pull/7`);
+  });
+
+  test('search repos uses GHE base', () => {
+    expect(gheUrl('search', 'repos', ['react'])).toBe(`${GHE}/search?q=react&type=repositories`);
+  });
+
+  test('gist commands use GHE gist path', () => {
+    expect(gheUrl('gist', 'list')).toBe(`${GHE}/gist`);
+    expect(gheUrl('gist', 'view', ['abc123'])).toBe(`${GHE}/gist/abc123`);
+  });
+
+  test('default makeCommands() still uses github.com', () => {
+    const defaultCmds = makeCommands();
+    const sub = defaultCmds.find(c => c.name === 'repo').subcommands.find(s => s.name === 'view');
+    expect(sub.url(['facebook/react'])).toBe('https://github.com/facebook/react');
   });
 });

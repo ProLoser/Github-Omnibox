@@ -1,8 +1,14 @@
 import { resolve } from '../src/navigate.js';
-import { COMMANDS } from '../src/commands.js';
+import { COMMANDS, makeCommands } from '../src/commands.js';
 
 function nav(text) {
   return resolve(text, COMMANDS);
+}
+
+const GHE = 'https://github.myco.com';
+const gheCommands = makeCommands(GHE);
+function gheNav(text) {
+  return resolve(text, gheCommands, GHE);
 }
 
 describe('resolve – known commands', () => {
@@ -130,5 +136,39 @@ describe('resolve – shortcuts and fallbacks', () => {
   test('trailing spaces are handled gracefully', () => {
     expect(nav('repo create   ')).toBe('https://github.com/new');
     expect(nav('repo view facebook/react  ')).toBe('https://github.com/facebook/react');
+  });
+});
+
+describe('resolve – GitHub Enterprise base URL', () => {
+  test('empty string → GHE home', () => {
+    expect(gheNav('')).toBe(GHE);
+  });
+
+  test('repo view uses GHE base', () => {
+    expect(gheNav('repo view myorg/myrepo')).toBe(`${GHE}/myorg/myrepo`);
+  });
+
+  test('issue list uses GHE base', () => {
+    expect(gheNav('issue list myorg/myrepo')).toBe(`${GHE}/myorg/myrepo/issues`);
+  });
+
+  test('pr view uses GHE base', () => {
+    expect(gheNav('pr view myorg/myrepo 7')).toBe(`${GHE}/myorg/myrepo/pull/7`);
+  });
+
+  test('owner/repo shorthand navigates to GHE', () => {
+    expect(gheNav('myorg/myrepo')).toBe(`${GHE}/myorg/myrepo`);
+  });
+
+  test('unknown command falls back to GHE search', () => {
+    const url = gheNav('nope view foo');
+    expect(url).toContain(`${GHE}/search`);
+    expect(url).not.toContain('github.com');
+  });
+
+  test('search repos uses GHE base', () => {
+    expect(gheNav('search repos react hooks')).toBe(
+      `${GHE}/search?q=react%20hooks&type=repositories`,
+    );
   });
 });

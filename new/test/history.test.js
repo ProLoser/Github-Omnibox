@@ -89,3 +89,53 @@ describe('searchHistory', () => {
     expect(result).toContain('foo/bar');
   });
 });
+
+describe('searchHistory – GitHub Enterprise base URL', () => {
+  const GHE = 'https://github.myco.com';
+
+  test('extracts repos from GHE URLs', async () => {
+    const mockSearch = (_opts, callback) => {
+      callback([
+        { url: `${GHE}/myorg/myrepo`, visitCount: 5 },
+        { url: `${GHE}/myorg/other`, visitCount: 2 },
+      ]);
+    };
+    const result = await searchHistory('', mockSearch, GHE);
+    expect(result).toContain('myorg/myrepo');
+    expect(result).toContain('myorg/other');
+  });
+
+  test('does not match github.com URLs when using GHE base', async () => {
+    const mockSearch = (_opts, callback) => {
+      callback([
+        { url: 'https://github.com/facebook/react', visitCount: 5 },
+        { url: `${GHE}/myorg/myrepo`, visitCount: 3 },
+      ]);
+    };
+    const result = await searchHistory('', mockSearch, GHE);
+    expect(result).toContain('myorg/myrepo');
+    expect(result).not.toContain('facebook/react');
+  });
+
+  test('passes GHE base URL as search text prefix', async () => {
+    let capturedOpts;
+    const mockSearch = (opts, callback) => {
+      capturedOpts = opts;
+      callback([]);
+    };
+    await searchHistory('myorg', mockSearch, GHE);
+    expect(capturedOpts.text).toBe(`${GHE}/myorg`);
+  });
+
+  test('ranks GHE repos by visit count', async () => {
+    const mockSearch = (_opts, callback) => {
+      callback([
+        { url: `${GHE}/myorg/low`, visitCount: 1 },
+        { url: `${GHE}/myorg/high`, visitCount: 9 },
+      ]);
+    };
+    const result = await searchHistory('', mockSearch, GHE);
+    expect(result[0]).toBe('myorg/high');
+    expect(result[1]).toBe('myorg/low');
+  });
+});

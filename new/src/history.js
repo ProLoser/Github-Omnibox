@@ -8,29 +8,38 @@
  * unit-testable without a real browser.
  */
 
-const REPO_URL_RE = /^https:\/\/github\.com\/([^/]+\/[^/]+)/;
+const DEFAULT_BASE = 'https://github.com';
+
+/** Escape special regex characters in a string literal. */
+function escapeRegex(s) {
+  return s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
 
 /**
  * @param {string}   query         - partial text to filter URLs (e.g. "facebook")
  * @param {Function} historySearch - chrome.history.search (injectable)
+ * @param {string}   [baseUrl]     - GitHub base URL (default: https://github.com)
  * @returns {Promise<string[]>} unique "owner/repo" strings, most-visited first
  */
 export async function searchHistory(
   query,
   historySearch = /* istanbul ignore next */ globalThis.chrome?.history?.search,
+  baseUrl = DEFAULT_BASE,
 ) {
   if (typeof historySearch !== 'function') return [];
 
+  const repoUrlRe = new RegExp(`^${escapeRegex(baseUrl)}/([^/]+/[^/]+)`);
+
   const searchText = query
-    ? `https://github.com/${query}`
-    : 'https://github.com/';
+    ? `${baseUrl}/${query}`
+    : `${baseUrl}/`;
 
   return new Promise(resolve => {
     historySearch({ text: searchText, maxResults: 30 }, items => {
       /** @type {Map<string, number>} repo → total visitCount */
       const counts = new Map();
       for (const item of items ?? []) {
-        const m = item.url?.match(REPO_URL_RE);
+        const m = item.url?.match(repoUrlRe);
         if (m) {
           const repo = m[1];
           counts.set(repo, (counts.get(repo) ?? 0) + (item.visitCount ?? 1));
